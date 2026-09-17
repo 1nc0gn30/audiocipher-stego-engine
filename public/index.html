@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google AudioCipher Studio | Acoustic Cryptography & Steganography</title>
+  <style>
+    :root {
+      --g-blue: #1a73e8;
+      --g-blue-dark: #1557b0;
+      --g-blue-light: #e8f0fe;
+      --g-green: #1e8e3e;
+      --g-green-light: #e6f4ea;
+      --g-red: #d93025;
+      --g-red-light: #fce8e6;
+      --surface: #ffffff;
+      --surface-variant: #f8f9fa;
+      --border: #dadce0;
+      --border-subtle: #e8eaed;
+      --text: #202124;
+      --text-secondary: #5f6368;
+      --code-bg: #f1f3f4;
+      --shadow-sm: 0 1px 2px rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+      --shadow-md: 0 4px 8px 3px rgba(60,64,67,0.15);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-full: 9999px;
+    }
+    [data-theme="dark"] {
+      --surface: #1e1f20;
+      --surface-variant: #131314;
+      --border: #3c4043;
+      --border-subtle: #2d3134;
+      --text: #e3e3e3;
+      --text-secondary: #9aa0a6;
+      --g-blue-light: #1c3b5e;
+      --g-green-light: #133820;
+      --g-red-light: #3c1e1e;
+      --code-bg: #282a2c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Google Sans", "Segoe UI", Roboto, sans-serif;
+      background: var(--surface-variant);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      z-index: 10;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+    .brand-icon {
+      background: var(--g-blue);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .badge {
+      background: var(--g-blue-light);
+      color: var(--g-blue);
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .btn-icon {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      flex: 1;
+      overflow: hidden;
+    }
+    aside {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    .mode-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .mode-item {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-variant);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mode-item:hover {
+      border-color: var(--g-blue);
+      background: var(--g-blue-light);
+    }
+    .mode-item.active {
+      background: var(--g-blue-light);
+      border-color: var(--g-blue);
+    }
+    .mode-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .mode-desc {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+    main {
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    .slider-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--g-blue);
+    }
+    button.btn-primary {
+      background: var(--g-blue);
+      color: white;
+      border: none;
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.15s;
+    }
+    button.btn-primary:hover { background: var(--g-blue-dark); }
+    canvas {
+      width: 100%;
+      height: 120px;
+      background: #000;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+    .result-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🔒</div>
+      <span>Google AudioCipher Studio</span>
+      <span class="badge">Acoustic Cryptography & Stego</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="toggleTheme()">🌓 Theme</button>
+      <button class="btn-icon" onclick="synthesizeCarrier()">🔊 Play Carrier</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside>
+      <div class="section-title">Cryptographic Modules</div>
+      <div class="mode-list">
+        <div class="mode-item active" onclick="switchMode('encrypt')">
+          <div class="mode-name">Audio-Keyed Encryption</div>
+          <div class="mode-desc">Acoustic waveform + dB key derivation</div>
+        </div>
+        <div class="mode-item" onclick="switchMode('stego')">
+          <div class="mode-name">LSB Audio Steganography</div>
+          <div class="mode-desc">Hide data in uncompressed PCM WAV</div>
+        </div>
+        <div class="mode-item" onclick="switchMode('morse')">
+          <div class="mode-name">Morse Audio Synthesizer</div>
+          <div class="mode-desc">Text to acoustic Morse code waveform</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:1rem;">Oscilloscope Monitor</div>
+      <canvas id="scope-canvas" width="300" height="120"></canvas>
+    </aside>
+
+    <main>
+      <!-- Section 1: Audio Encryption -->
+      <div class="card" id="panel-encrypt">
+        <div class="section-title">Audio-Keyed Authenticated Encryption</div>
+        <div class="form-group">
+          <label>Payload Message / Secret Text</label>
+          <textarea id="enc-payload" rows="3">Top Secret Sovereign Mission Briefing #757</textarea>
+        </div>
+
+        <div class="form-group">
+          <div class="slider-row">
+            <label>Decibel Level Modifier (Volume Key)</label>
+            <span id="val-db">50.0 dB</span>
+          </div>
+          <input type="range" id="param-db" min="0" max="100" value="50" oninput="document.getElementById('val-db').innerText = this.value + '.0 dB'">
+        </div>
+
+        <div style="display:flex; gap:0.75rem;">
+          <button class="btn-primary" onclick="runEncryption()">🔒 Encrypt with Audio Key</button>
+          <button class="btn-primary" style="background:#5f6368;" onclick="runDecryption()">🔓 Decrypt Payload</button>
+        </div>
+
+        <div style="margin-top:1rem;">
+          <label>Encrypted Ciphertext Blob:</label>
+          <div class="result-box" id="enc-result">Ready for cryptographic operation.</div>
+        </div>
+      </div>
+
+      <!-- Section 2: Steganography -->
+      <div class="card" id="panel-stego" style="display:none;">
+        <div class="section-title">PCM Audio Steganography</div>
+        <div class="form-group">
+          <label>Secret Payload to Embed</label>
+          <textarea id="stego-payload" rows="3">Hidden Steganographic Sovereign Vector</textarea>
+        </div>
+        <div style="display:flex; gap:0.75rem;">
+          <button class="btn-primary" onclick="runStegoEmbed()">🛡️ Embed into Audio Carrier</button>
+          <button class="btn-primary" style="background:#5f6368;" onclick="runStegoExtract()">🔍 Extract from Carrier</button>
+        </div>
+        <div style="margin-top:1rem;">
+          <label>Steganography Result:</label>
+          <div class="result-box" id="stego-result">Ready for steganographic injection.</div>
+        </div>
+      </div>
+
+      <!-- Section 3: Morse Synthesizer -->
+      <div class="card" id="panel-morse" style="display:none;">
+        <div class="section-title">Acoustic Morse Code Synthesizer</div>
+        <div class="form-group">
+          <label>Text Message</label>
+          <input type="text" id="morse-text" value="SOS SOVEREIGN AGENT 757">
+        </div>
+        <div class="form-group">
+          <div class="slider-row">
+            <label>Speed (Words Per Minute)</label>
+            <span id="val-wpm">20 WPM</span>
+          </div>
+          <input type="range" id="param-wpm" min="5" max="40" value="20" oninput="document.getElementById('val-wpm').innerText = this.value + ' WPM'">
+        </div>
+        <button class="btn-primary" onclick="runMorse()">📻 Synthesize Morse Code WAV</button>
+        <div style="margin-top:1rem;">
+          <label>Morse Notation & Audio:</label>
+          <div class="result-box" id="morse-result">Ready for synthesis.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let activeMode = 'encrypt';
+    let lastWavB64 = '';
+    let lastEncryptedB64 = '';
+
+    function toggleTheme() {
+      const current = document.body.getAttribute('data-theme');
+      document.body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+
+    function switchMode(m) {
+      activeMode = m;
+      document.querySelectorAll('.mode-item').forEach(i => i.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById('panel-encrypt').style.display = m === 'encrypt' ? 'block' : 'none';
+      document.getElementById('panel-stego').style.display = m === 'stego' ? 'block' : 'none';
+      document.getElementById('panel-morse').style.display = m === 'morse' ? 'block' : 'none';
+    }
+
+    async function runEncryption() {
+      const payload = document.getElementById('enc-payload').value;
+      const volume_db = parseFloat(document.getElementById('param-db').value);
+      const resp = await fetch('/api/encrypt', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({payload, volume_db})
+      });
+      const data = await resp.json();
+      lastEncryptedB64 = data.encrypted_blob_base64;
+      document.getElementById('enc-result').innerText = `✓ ENCRYPTED (${data.length_bytes} bytes)\nPayload: ${data.encrypted_blob_base64}`;
+      drawVisualizer();
+    }
+
+    async function runDecryption() {
+      if (!lastEncryptedB64) {
+        alert('Please encrypt a payload first.');
+        return;
+      }
+      const volume_db = parseFloat(document.getElementById('param-db').value);
+      const resp = await fetch('/api/decrypt', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({encrypted_blob_base64: lastEncryptedB64, volume_db})
+      });
+      const data = await resp.json();
+      if (data.status === 'success') {
+        document.getElementById('enc-result').innerText = `✓ DECRYPTED & AUTHENTICATED:\n${data.decrypted_text}`;
+      } else {
+        document.getElementById('enc-result').innerText = `✗ DECRYPTION FAILED: ${data.message}`;
+      }
+    }
+
+    async function runStegoEmbed() {
+      const payload = document.getElementById('stego-payload').value;
+      const resp = await fetch('/api/stego/embed', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({payload})
+      });
+      const data = await resp.json();
+      lastWavB64 = data.stego_wav_base64;
+      document.getElementById('stego-result').innerText = `✓ EMBEDDED (${data.payload_size_bytes} bytes into ${data.carrier_duration_seconds}s WAV)\nBase64 WAV Ready.`;
+      drawVisualizer();
+    }
+
+    async function runStegoExtract() {
+      if (!lastWavB64) {
+        alert('Please embed a payload into audio carrier first.');
+        return;
+      }
+      const resp = await fetch('/api/stego/extract', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({carrier_wav_base64: lastWavB64})
+      });
+      const data = await resp.json();
+      if (data.status === 'success') {
+        document.getElementById('stego-result').innerText = `✓ EXTRACTED & CRC32 VERIFIED:\n${data.extracted_text}`;
+      } else {
+        document.getElementById('stego-result').innerText = `✗ EXTRACTION FAILED: ${data.message}`;
+      }
+    }
+
+    async function runMorse() {
+      const text = document.getElementById('morse-text').value;
+      const wpm = parseInt(document.getElementById('param-wpm').value);
+      const resp = await fetch('/api/morse', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({text, wpm, frequency: 800})
+      });
+      const data = await resp.json();
+      lastWavB64 = data.wav_base64;
+      document.getElementById('morse-result').innerText = `Morse: ${data.morse_notation}\nDuration: ${data.duration_seconds}s`;
+      playAudioBlob(data.wav_base64);
+    }
+
+    function playAudioBlob(b64) {
+      const snd = new Audio("data:audio/wav;base64," + b64);
+      snd.play();
+      drawVisualizer();
+    }
+
+    function synthesizeCarrier() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+      osc.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.5);
+      drawVisualizer();
+    }
+
+    function drawVisualizer() {
+      const canvas = document.getElementById('scope-canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#1a73e8';
+      ctx.beginPath();
+      const sliceWidth = canvas.width / 50;
+      let x = 0;
+      for (let i = 0; i < 50; i++) {
+        const v = Math.sin(i * 0.3 + Math.random() * 0.5) * 40 + canvas.height / 2;
+        if (i === 0) ctx.moveTo(x, v);
+        else ctx.lineTo(x, v);
+        x += sliceWidth;
+      }
+      ctx.stroke();
+    }
+    drawVisualizer();
+  </script>
+</body>
+</html>
