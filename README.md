@@ -15,7 +15,7 @@
 - 🔒 **Audio-Keyed Authenticated Encryption**: Derives 256-bit cryptographic keys using PBKDF2-HMAC-SHA256 from raw acoustic waveforms and precise decibel/volume modifiers. Encrypts payloads using authenticated keystream cipher + HMAC-SHA256 integrity tags.
 - 🛡️ **PCM Audio Steganography**: Embeds secret files and strings into the least significant bits (LSB) of uncompressed 16-bit PCM WAV audio carriers with CRC32 integrity checksum validation and magic header verification.
 - 📻 **Acoustic Morse Code & Spectrogram Synthesizer**: Converts text messages into audible Morse code tone sequences and multi-frequency spectrogram visual patterns at configurable speed (WPM) and frequency (Hz).
-- 🎨 **Google Material 3 Light Mode Web UI**: Real-time Web Audio API oscilloscope visualizer, interactive audio cipher ritual runner, drag-and-drop stego carrier injector, and 1-click WAV export.
+- 🎨 **AudioCipher Studio Web UI**: Real-time Web Audio API oscilloscope visualizer, interactive audio cipher ritual runner, drag-and-drop stego carrier injector, and 1-click WAV export (design influenced by Material 3 tokens).
 - ⚡ **Zero Third-Party Runtime Dependencies**: 100% Python Standard Library runtime (`wave`, `struct`, `hashlib`, `hmac`, `math`, `zlib`, `http.server`, `urllib`, `argparse`).
 - 🤖 **FastMCP Server Protocol**: Full Model Context Protocol (MCP) JSON-RPC 2.0 stdio server for Claude Desktop, Cursor, Cline, and autonomous AI agents.
 
@@ -53,7 +53,7 @@ audiocipher extract stego.wav -o recovered_secret.txt
 # Synthesize Morse code audio WAV from plaintext message
 audiocipher morse "SOS SOVEREIGN AGENT 757" --freq 800 --wpm 20 -o morse.wav
 
-# Launch Google Material 3 AudioCipher Studio Web UI
+# Launch AudioCipher Studio Web UI (Material 3 influenced)
 audiocipher serve --port 8096
 
 # Start FastMCP stdio server for LLM agents
@@ -137,7 +137,7 @@ flowchart TD
     subgraph Channels["🖥️ User & AI Interfaces"]
         CLI["💻 CLI Entrypoint\n(audiocipher / python -m)"]
         MCP["🤖 FastMCP Stdio Server\n(Claude / Cursor / Cline)"]
-        UI["🎨 Google Material 3 Studio\n(Web Audio API FFT & DTMF Dialpad)"]
+        UI["🎨 AudioCipher Studio\n(Web Audio API FFT & DTMF Dialpad)"]
     end
 
     Wav --> Crypto

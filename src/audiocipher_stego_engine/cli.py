@@ -89,7 +89,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_morse.add_argument("--wpm", type=int, default=20, help="Words per minute (default: 20)")
 
     # serve
-    p_serve = sub.add_parser("serve", parents=[base], help="Start Google Material 3 AudioCipher Studio Web UI")
+    p_serve = sub.add_parser("serve", parents=[base], help="Start AudioCipher Studio Web UI (Material 3 influenced)")
     p_serve.add_argument("--host", default="0.0.0.0", help="Host address (default: 0.0.0.0)")
     p_serve.add_argument("--port", type=int, default=8096, help="Port (default: 8096)")
 
@@ -185,7 +185,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     elif args.command == "serve":
         server = run_ui_server(args.host, args.port)
-        print(f"{c.GREEN}🔒 Google AudioCipher Studio UI running at:{c.RESET} http://{args.host}:{args.port}")
+        print(f"{c.GREEN}🔒 AudioCipher Studio UI running at:{c.RESET} http://{args.host}:{args.port}")
         try:
             server.serve_forever()
         except KeyboardInterrupt:

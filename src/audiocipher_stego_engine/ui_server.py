@@ -1,5 +1,5 @@
 """
-Google Material 3 AudioCipher Studio UI & REST API Server.
+AudioCipher Studio UI & REST API Server (design influenced by Material 3 tokens).
 Zero third-party runtime dependencies.
 """
 
@@ -35,7 +35,7 @@ EMBEDDED_STUDIO_HTML = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google AudioCipher Studio | Acoustic Cryptography & Steganography</title>
+  <title>AudioCipher Studio | Acoustic Cryptography & Steganography</title>
   <style>
     :root {
       --g-blue: #1a73e8;
@@ -63,7 +63,7 @@ EMBEDDED_STUDIO_HTML = """<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <div class="brand"><span>🔒</span> Google AudioCipher Studio</div>
+    <div class="brand"><span>🔒</span> AudioCipher Studio</div>
   </header>
   <div class="container">
     <aside>

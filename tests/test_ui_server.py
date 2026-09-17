@@ -62,7 +62,7 @@ def test_ui_index_html(live_server):
         assert resp.status == 200
         content = resp.read().decode("utf-8")
         assert "<!DOCTYPE html>" in content
-        assert "Google AudioCipher Studio" in content
+        assert "AudioCipher Studio" in content
 
 
 def test_api_dtmf_endpoints(live_server):
