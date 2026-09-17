@@ -19,7 +19,12 @@ from audiocipher_stego_engine.crypto_core import (
     derive_audio_key,
     encrypt_payload,
 )
-from audiocipher_stego_engine.spectrogram import synthesize_morse_audio, text_to_morse
+from audiocipher_stego_engine.spectrogram import (
+    decode_dtmf_audio,
+    synthesize_dtmf_audio,
+    synthesize_morse_audio,
+    text_to_morse,
+)
 from audiocipher_stego_engine.stego_engine import StegoEngine
 from audiocipher_stego_engine.wav_codec import AudioBuffer
 
@@ -282,6 +287,38 @@ class AudioCipherHTTPHandler(BaseHTTPRequestHandler):
                 "morse_notation": text_to_morse(text),
                 "duration_seconds": round(morse_audio.duration_seconds, 2),
                 "wav_base64": base64.b64encode(wav_bytes).decode("ascii")
+            })
+            return
+
+        elif path == "/api/dtmf/synthesize":
+            digits = body.get("digits", "1234#")
+            tone_dur = float(body.get("tone_duration", 0.1))
+            silence_dur = float(body.get("silence_duration", 0.05))
+
+            dtmf_audio = synthesize_dtmf_audio(digits, tone_duration=tone_dur, silence_duration=silence_dur)
+            wav_bytes = dtmf_audio.to_wav_bytes()
+
+            self._send_json({
+                "status": "success",
+                "digits": digits.upper(),
+                "duration_seconds": round(dtmf_audio.duration_seconds, 2),
+                "wav_base64": base64.b64encode(wav_bytes).decode("ascii")
+            })
+            return
+
+        elif path == "/api/dtmf/decode":
+            wav_b64 = body.get("wav_base64", "")
+            tone_dur = float(body.get("tone_duration", 0.1))
+            silence_dur = float(body.get("silence_duration", 0.05))
+
+            wav_bytes = base64.b64decode(wav_b64)
+            audio = AudioBuffer.from_wav_bytes(wav_bytes)
+            decoded = decode_dtmf_audio(audio, tone_duration=tone_dur, silence_duration=silence_dur)
+
+            self._send_json({
+                "status": "success",
+                "decoded_digits": decoded,
+                "audio_duration_seconds": round(audio.duration_seconds, 2)
             })
             return
 

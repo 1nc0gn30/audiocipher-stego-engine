@@ -12,6 +12,8 @@ from audiocipher_stego_engine.crypto_core import (
 )
 from audiocipher_stego_engine.mcp_server import MCPServer, run_mcp_server
 from audiocipher_stego_engine.spectrogram import (
+    decode_dtmf_audio,
+    synthesize_dtmf_audio,
     synthesize_morse_audio,
     synthesize_spectrogram_watermark,
     text_to_morse,
@@ -31,6 +33,9 @@ __all__ = [
     "text_to_morse",
     "synthesize_morse_audio",
     "synthesize_spectrogram_watermark",
+    "synthesize_dtmf_audio",
+    "decode_dtmf_audio",
     "MCPServer",
     "run_mcp_server",
 ]
+

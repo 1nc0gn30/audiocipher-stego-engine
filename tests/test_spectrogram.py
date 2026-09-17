@@ -30,3 +30,14 @@ def test_synthesize_spectrogram_watermark():
     audio = synthesize_spectrogram_watermark(bitmap, pixel_duration=0.02)
     assert audio.duration_seconds >= 0.05
     assert len(audio.samples) > 0
+
+
+def test_dtmf_synthesis_and_decode():
+    from audiocipher_stego_engine.spectrogram import decode_dtmf_audio, synthesize_dtmf_audio
+
+    digits = "8675309#"
+    audio = synthesize_dtmf_audio(digits, tone_duration=0.08, silence_duration=0.04)
+    assert audio.duration_seconds > 0.5
+    decoded = decode_dtmf_audio(audio, tone_duration=0.08, silence_duration=0.04)
+    assert decoded == digits
+

@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Google AudioCipher Studio | Acoustic Cryptography & Steganography</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --g-blue: #1a73e8;
@@ -13,34 +16,41 @@
       --g-green-light: #e6f4ea;
       --g-red: #d93025;
       --g-red-light: #fce8e6;
+      --g-purple: #9334e6;
+      --g-purple-light: #f3e8fd;
       --surface: #ffffff;
       --surface-variant: #f8f9fa;
+      --surface-card: #ffffff;
       --border: #dadce0;
       --border-subtle: #e8eaed;
       --text: #202124;
       --text-secondary: #5f6368;
       --code-bg: #f1f3f4;
-      --shadow-sm: 0 1px 2px rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+      --shadow-sm: 0 1px 2px rgba(60,64,67,0.15), 0 1px 3px 1px rgba(60,64,67,0.1);
       --shadow-md: 0 4px 8px 3px rgba(60,64,67,0.15);
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-full: 9999px;
+      --font-sans: 'Google Sans', 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'Roboto Mono', monospace;
     }
     [data-theme="dark"] {
       --surface: #1e1f20;
       --surface-variant: #131314;
+      --surface-card: #28292a;
       --border: #3c4043;
       --border-subtle: #2d3134;
       --text: #e3e3e3;
       --text-secondary: #9aa0a6;
+      --code-bg: #18191a;
       --g-blue-light: #1c3b5e;
       --g-green-light: #133820;
       --g-red-light: #3c1e1e;
-      --code-bg: #282a2c;
+      --g-purple-light: #2c1a3f;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Google Sans", "Segoe UI", Roboto, sans-serif;
+      font-family: var(--font-sans);
       background: var(--surface-variant);
       color: var(--text);
       display: flex;
@@ -51,11 +61,10 @@
     header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 0.75rem 1.5rem;
+      padding: 0.65rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
       z-index: 10;
     }
     .brand {
@@ -66,11 +75,11 @@
       font-weight: 600;
     }
     .brand-icon {
-      background: var(--g-blue);
-      color: white;
+      background: var(--g-blue-light);
+      color: var(--g-blue);
       width: 32px;
       height: 32px;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -87,16 +96,24 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
     .btn-icon {
-      background: none;
+      background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 0.4rem 0.75rem;
-      border-radius: var(--radius-sm);
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-full);
       cursor: pointer;
       font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s;
+    }
+    .btn-icon:hover {
+      background: var(--surface-variant);
     }
     .container {
       display: grid;
@@ -114,12 +131,12 @@
       gap: 1.25rem;
     }
     .section-title {
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: 0.8rem;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.05em;
       color: var(--text-secondary);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
     .mode-list {
       display: flex;
@@ -127,7 +144,7 @@
       gap: 0.4rem;
     }
     .mode-item {
-      padding: 0.75rem 1rem;
+      padding: 0.65rem 0.85rem;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle);
       background: var(--surface-variant);
@@ -152,77 +169,132 @@
       color: var(--text-secondary);
     }
     main {
-      padding: 1.5rem;
+      padding: 1.25rem 1.5rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
+      gap: 1rem;
     }
     .card {
-      background: var(--surface);
+      background: var(--surface-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
       padding: 1.25rem;
       box-shadow: var(--shadow-sm);
     }
     .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
       margin-bottom: 1rem;
     }
     label {
+      display: block;
       font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--text);
     }
-    input[type="text"], textarea {
+    textarea, input[type="text"] {
       width: 100%;
-      padding: 0.6rem 0.75rem;
+      padding: 0.65rem 0.75rem;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       background: var(--surface);
       color: var(--text);
-      font-family: inherit;
+      font-family: var(--font-mono);
       font-size: 0.9rem;
+      outline: none;
     }
-    .slider-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--g-blue);
+      box-shadow: 0 0 0 2px var(--g-blue-light);
     }
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--g-blue);
-    }
-    button.btn-primary {
+    .btn-primary {
       background: var(--g-blue);
       color: white;
       border: none;
-      padding: 0.65rem 1.25rem;
+      padding: 0.55rem 1.2rem;
       border-radius: var(--radius-sm);
       font-weight: 600;
+      font-size: 0.85rem;
       cursor: pointer;
-      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
       transition: background 0.15s;
     }
-    button.btn-primary:hover { background: var(--g-blue-dark); }
-    canvas {
-      width: 100%;
-      height: 120px;
-      background: #000;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
+    .btn-primary:hover {
+      background: var(--g-blue-dark);
     }
     .result-box {
       background: var(--code-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    .canvas-box {
+      background: #0a0d14;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 1rem;
-      font-family: monospace;
-      font-size: 0.85rem;
-      word-break: break-all;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    canvas {
+      width: 100%;
+      height: 120px;
+      display: block;
+      background: #0a0d14;
+    }
+    /* DTMF Keypad */
+    .dialpad-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      max-width: 320px;
+      margin-top: 0.5rem;
+    }
+    .dial-btn {
+      background: var(--surface-variant);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.1s;
+    }
+    .dial-btn:hover {
+      background: var(--g-blue-light);
+      border-color: var(--g-blue);
+      color: var(--g-blue);
+    }
+    .dial-btn:active {
+      transform: scale(0.95);
+      background: var(--g-blue);
+      color: white;
+    }
+    .dial-btn sub {
+      display: block;
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .audio-player-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--surface-variant);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
     }
   </style>
 </head>
@@ -235,95 +307,138 @@
     </div>
     <div class="header-actions">
       <button class="btn-icon" onclick="toggleTheme()">🌓 Theme</button>
-      <button class="btn-icon" onclick="synthesizeCarrier()">🔊 Play Carrier</button>
+      <button class="btn-icon" onclick="playCurrentAudio()">▶️ Play Audio</button>
+      <button class="btn-icon" onclick="downloadCurrentWav()">💾 Save WAV</button>
     </div>
   </header>
 
   <div class="container">
     <aside>
-      <div class="section-title">Cryptographic Modules</div>
+      <div class="section-title">Cryptographic Modes</div>
       <div class="mode-list">
         <div class="mode-item active" onclick="switchMode('encrypt')">
-          <div class="mode-name">Audio-Keyed Encryption</div>
-          <div class="mode-desc">Acoustic waveform + dB key derivation</div>
+          <div class="mode-name">Acoustic Keyed Cipher</div>
+          <div class="mode-desc">HKDF key derivation from audio spectrum</div>
         </div>
         <div class="mode-item" onclick="switchMode('stego')">
-          <div class="mode-name">LSB Audio Steganography</div>
-          <div class="mode-desc">Hide data in uncompressed PCM WAV</div>
+          <div class="mode-name">PCM LSB Steganography</div>
+          <div class="mode-desc">Hide arbitrary payloads in carrier audio</div>
+        </div>
+        <div class="mode-item" onclick="switchMode('dtmf')">
+          <div class="mode-name">DTMF Dual-Tone Dialpad</div>
+          <div class="mode-desc">Acoustic phone tone synthesis & Goertzel decode</div>
         </div>
         <div class="mode-item" onclick="switchMode('morse')">
-          <div class="mode-name">Morse Audio Synthesizer</div>
-          <div class="mode-desc">Text to acoustic Morse code waveform</div>
+          <div class="mode-name">Morse Code Synthesizer</div>
+          <div class="mode-desc">Standard ITU Morse acoustic PCM generator</div>
         </div>
       </div>
 
-      <div class="section-title" style="margin-top:1rem;">Oscilloscope Monitor</div>
-      <canvas id="scope-canvas" width="300" height="120"></canvas>
+      <div class="section-title" style="margin-top:0.5rem;">Web Audio Live Scope</div>
+      <div class="canvas-box">
+        <canvas id="scope-canvas" width="300" height="120"></canvas>
+      </div>
+      <div id="audio-status" style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono); text-align:center;">Audio Engine Idle</div>
     </aside>
 
     <main>
-      <!-- Section 1: Audio Encryption -->
+      <!-- Panel 1: Audio Keyed Encryption -->
       <div class="card" id="panel-encrypt">
-        <div class="section-title">Audio-Keyed Authenticated Encryption</div>
+        <div class="section-title">Acoustic-Keyed Payload Encryption (AES-GCM / Poly1305 Simulation)</div>
         <div class="form-group">
-          <label>Payload Message / Secret Text</label>
-          <textarea id="enc-payload" rows="3">Top Secret Sovereign Mission Briefing #757</textarea>
+          <label>Confidential Payload String</label>
+          <textarea id="enc-payload" rows="3">Top Secret Sovereign Agent Directive #757 -- Zero-Trust Channel Verified</textarea>
         </div>
-
         <div class="form-group">
-          <div class="slider-row">
-            <label>Decibel Level Modifier (Volume Key)</label>
-            <span id="val-db">50.0 dB</span>
-          </div>
-          <input type="range" id="param-db" min="0" max="100" value="50" oninput="document.getElementById('val-db').innerText = this.value + '.0 dB'">
+          <label>Audio Spectrum Derivation Sensitivity</label>
+          <input type="range" id="param-db" min="10" max="90" value="50" oninput="document.getElementById('val-db').innerText = this.value + ' dB'">
+          <span id="val-db" style="font-size:0.8rem; font-family:var(--font-mono); color:var(--text-secondary);">50 dB threshold</span>
         </div>
-
-        <div style="display:flex; gap:0.75rem;">
-          <button class="btn-primary" onclick="runEncryption()">🔒 Encrypt with Audio Key</button>
-          <button class="btn-primary" style="background:#5f6368;" onclick="runDecryption()">🔓 Decrypt Payload</button>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn-primary" onclick="runEncryption()">🔒 Encrypt with Acoustic Key</button>
+          <button class="btn-primary" style="background:#5f6368;" onclick="runDecryption()">🔓 Decrypt & Verify</button>
         </div>
-
-        <div style="margin-top:1rem;">
-          <label>Encrypted Ciphertext Blob:</label>
-          <div class="result-box" id="enc-result">Ready for cryptographic operation.</div>
-        </div>
+        <div class="result-box" id="enc-result">Ready for cryptographic operation.</div>
       </div>
 
-      <!-- Section 2: Steganography -->
+      <!-- Panel 2: Stego -->
       <div class="card" id="panel-stego" style="display:none;">
-        <div class="section-title">PCM Audio Steganography</div>
+        <div class="section-title">PCM WAV Least Significant Bit (LSB) Steganography</div>
         <div class="form-group">
-          <label>Secret Payload to Embed</label>
-          <textarea id="stego-payload" rows="3">Hidden Steganographic Sovereign Vector</textarea>
+          <label>Covert Payload to Hide</label>
+          <textarea id="stego-payload" rows="3">CONFIDENTIAL_PASSPHRASE=omega_vector_9987</textarea>
         </div>
-        <div style="display:flex; gap:0.75rem;">
+        <div style="display:flex; gap:0.5rem;">
           <button class="btn-primary" onclick="runStegoEmbed()">🛡️ Embed into Audio Carrier</button>
           <button class="btn-primary" style="background:#5f6368;" onclick="runStegoExtract()">🔍 Extract from Carrier</button>
         </div>
-        <div style="margin-top:1rem;">
-          <label>Steganography Result:</label>
-          <div class="result-box" id="stego-result">Ready for steganographic injection.</div>
+        <div class="result-box" id="stego-result">Ready for steganographic injection.</div>
+      </div>
+
+      <!-- Panel 3: DTMF Dialpad -->
+      <div class="card" id="panel-dtmf" style="display:none;">
+        <div class="section-title">DTMF Dual-Tone Multi-Frequency Acoustic Dialpad & Goertzel Decoder</div>
+        <div class="form-group">
+          <label>Dialed Digits Sequence</label>
+          <input type="text" id="dtmf-digits" value="18005550199#">
+        </div>
+        <div style="display:flex; gap:1rem; align-items:flex-start; flex-wrap:wrap;">
+          <div class="dialpad-grid">
+            <button class="dial-btn" onclick="pressDial('1')">1<sub>.</sub></button>
+            <button class="dial-btn" onclick="pressDial('2')">2<sub>ABC</sub></button>
+            <button class="dial-btn" onclick="pressDial('3')">3<sub>DEF</sub></button>
+            <button class="dial-btn" onclick="pressDial('A')">A<sub>SYS</sub></button>
+
+            <button class="dial-btn" onclick="pressDial('4')">4<sub>GHI</sub></button>
+            <button class="dial-btn" onclick="pressDial('5')">5<sub>JKL</sub></button>
+            <button class="dial-btn" onclick="pressDial('6')">6<sub>MNO</sub></button>
+            <button class="dial-btn" onclick="pressDial('B')">B<sub>PRI</sub></button>
+
+            <button class="dial-btn" onclick="pressDial('7')">7<sub>PQRS</sub></button>
+            <button class="dial-btn" onclick="pressDial('8')">8<sub>TUV</sub></button>
+            <button class="dial-btn" onclick="pressDial('9')">9<sub>WXYZ</sub></button>
+            <button class="dial-btn" onclick="pressDial('C')">C<sub>SEC</sub></button>
+
+            <button class="dial-btn" onclick="pressDial('*')">*<sub>CMD</sub></button>
+            <button class="dial-btn" onclick="pressDial('0')">0<sub>OPER</sub></button>
+            <button class="dial-btn" onclick="pressDial('#')">#<sub>END</sub></button>
+            <button class="dial-btn" onclick="pressDial('D')">D<sub>OVER</sub></button>
+          </div>
+          <div style="flex:1; min-width:260px;">
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+              <button class="btn-primary" onclick="synthesizeDtmf()">🔊 Synthesize Audio</button>
+              <button class="btn-primary" style="background:#5f6368;" onclick="decodeDtmf()">🔍 Goertzel Decode</button>
+              <button class="btn-icon" onclick="document.getElementById('dtmf-digits').value=''">Clear</button>
+            </div>
+            <div class="result-box" id="dtmf-result">Dial numbers above or click Synthesize.</div>
+          </div>
         </div>
       </div>
 
-      <!-- Section 3: Morse Synthesizer -->
+      <!-- Panel 4: Morse Synthesizer -->
       <div class="card" id="panel-morse" style="display:none;">
-        <div class="section-title">Acoustic Morse Code Synthesizer</div>
+        <div class="section-title">Acoustic Morse Code Synthesizer (ITU Standard)</div>
         <div class="form-group">
           <label>Text Message</label>
           <input type="text" id="morse-text" value="SOS SOVEREIGN AGENT 757">
         </div>
         <div class="form-group">
-          <div class="slider-row">
-            <label>Speed (Words Per Minute)</label>
-            <span id="val-wpm">20 WPM</span>
-          </div>
+          <label>Transmission Speed (WPM)</label>
           <input type="range" id="param-wpm" min="5" max="40" value="20" oninput="document.getElementById('val-wpm').innerText = this.value + ' WPM'">
+          <span id="val-wpm" style="font-size:0.8rem; font-family:var(--font-mono); color:var(--text-secondary);">20 WPM</span>
         </div>
         <button class="btn-primary" onclick="runMorse()">📻 Synthesize Morse Code WAV</button>
-        <div style="margin-top:1rem;">
-          <label>Morse Notation & Audio:</label>
-          <div class="result-box" id="morse-result">Ready for synthesis.</div>
+        <div class="result-box" id="morse-result">Ready for Morse synthesis.</div>
+      </div>
+
+      <!-- Audio Spectrogram Waterfall & Spectrum Visualizer -->
+      <div class="card">
+        <div class="section-title" style="display:flex; justify-content:space-between;">
+          <span>Web Audio API FFT Spectrogram Waterfall & Frequency Spectrum</span>
+          <span id="fft-peak" style="font-size:0.75rem; font-family:var(--font-mono); color:var(--g-blue);">Peak: 0 Hz</span>
+        </div>
+        <div class="canvas-box">
+          <canvas id="fft-canvas" width="800" height="140"></canvas>
         </div>
       </div>
     </main>
@@ -333,6 +448,9 @@
     let activeMode = 'encrypt';
     let lastWavB64 = '';
     let lastEncryptedB64 = '';
+    let audioCtx = null;
+    let analyser = null;
+    let currentAudioEl = null;
 
     function toggleTheme() {
       const current = document.body.getAttribute('data-theme');
@@ -345,7 +463,57 @@
       event.currentTarget.classList.add('active');
       document.getElementById('panel-encrypt').style.display = m === 'encrypt' ? 'block' : 'none';
       document.getElementById('panel-stego').style.display = m === 'stego' ? 'block' : 'none';
+      document.getElementById('panel-dtmf').style.display = m === 'dtmf' ? 'block' : 'none';
       document.getElementById('panel-morse').style.display = m === 'morse' ? 'block' : 'none';
+    }
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 512;
+        startVisualizerLoop();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playAudioBase64(b64) {
+      initAudioContext();
+      lastWavB64 = b64;
+      if (currentAudioEl) {
+        currentAudioEl.pause();
+      }
+      const audio = new Audio("data:audio/wav;base64," + b64);
+      currentAudioEl = audio;
+      const source = audioCtx.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      audio.play();
+      document.getElementById('audio-status').innerText = 'Audio Playing (FFT Active)';
+      audio.onended = () => {
+        document.getElementById('audio-status').innerText = 'Audio Engine Idle';
+      };
+    }
+
+    function playCurrentAudio() {
+      if (lastWavB64) {
+        playAudioBase64(lastWavB64);
+      } else {
+        alert('Synthesize an audio payload first.');
+      }
+    }
+
+    function downloadCurrentWav() {
+      if (!lastWavB64) {
+        alert('No audio generated yet.');
+        return;
+      }
+      const a = document.createElement('a');
+      a.href = "data:audio/wav;base64," + lastWavB64;
+      a.download = `audiocipher_${activeMode}.wav`;
+      a.click();
     }
 
     async function runEncryption() {
@@ -359,7 +527,6 @@
       const data = await resp.json();
       lastEncryptedB64 = data.encrypted_blob_base64;
       document.getElementById('enc-result').innerText = `✓ ENCRYPTED (${data.length_bytes} bytes)\nPayload: ${data.encrypted_blob_base64}`;
-      drawVisualizer();
     }
 
     async function runDecryption() {
@@ -390,8 +557,8 @@
       });
       const data = await resp.json();
       lastWavB64 = data.stego_wav_base64;
-      document.getElementById('stego-result').innerText = `✓ EMBEDDED (${data.payload_size_bytes} bytes into ${data.carrier_duration_seconds}s WAV)\nBase64 WAV Ready.`;
-      drawVisualizer();
+      document.getElementById('stego-result').innerText = `✓ EMBEDDED (${data.payload_size_bytes} bytes into ${data.carrier_duration_seconds}s WAV)\nAudio Ready for playback.`;
+      playAudioBase64(lastWavB64);
     }
 
     async function runStegoExtract() {
@@ -412,6 +579,64 @@
       }
     }
 
+    // DTMF Handlers
+    function pressDial(k) {
+      document.getElementById('dtmf-digits').value += k;
+      // Synthesize tone for single key click
+      initAudioContext();
+      const freqs = {
+        '1': [697, 1209], '2': [697, 1336], '3': [697, 1477], 'A': [697, 1633],
+        '4': [770, 1209], '5': [770, 1336], '6': [770, 1477], 'B': [770, 1633],
+        '7': [852, 1209], '8': [852, 1336], '9': [852, 1477], 'C': [852, 1633],
+        '*': [941, 1209], '0': [941, 1336], '#': [941, 1477], 'D': [941, 1633],
+      }[k];
+      if (freqs && audioCtx) {
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+        osc1.frequency.setValueAtTime(freqs[0], audioCtx.currentTime);
+        osc2.frequency.setValueAtTime(freqs[1], audioCtx.currentTime);
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        osc1.start();
+        osc2.start();
+        osc1.stop(audioCtx.currentTime + 0.15);
+        osc2.stop(audioCtx.currentTime + 0.15);
+      }
+    }
+
+    async function synthesizeDtmf() {
+      const digits = document.getElementById('dtmf-digits').value;
+      const resp = await fetch('/api/dtmf/synthesize', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({digits})
+      });
+      const data = await resp.json();
+      lastWavB64 = data.wav_base64;
+      document.getElementById('dtmf-result').innerText = `✓ SYNTHESIZED (${data.digits}, ${data.duration_seconds}s WAV)\nPlaying Acoustic Signal...`;
+      playAudioBase64(lastWavB64);
+    }
+
+    async function decodeDtmf() {
+      if (!lastWavB64) {
+        alert('Please synthesize a DTMF sequence first.');
+        return;
+      }
+      const resp = await fetch('/api/dtmf/decode', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({wav_base64: lastWavB64})
+      });
+      const data = await resp.json();
+      document.getElementById('dtmf-result').innerText = `✓ GOERTZEL DECODED DIGITS: [ ${data.decoded_digits} ]\nAudio Duration: ${data.audio_duration_seconds}s`;
+    }
+
+    // Morse Handlers
     async function runMorse() {
       const text = document.getElementById('morse-text').value;
       const wpm = parseInt(document.getElementById('param-wpm').value);
@@ -423,45 +648,72 @@
       const data = await resp.json();
       lastWavB64 = data.wav_base64;
       document.getElementById('morse-result').innerText = `Morse: ${data.morse_notation}\nDuration: ${data.duration_seconds}s`;
-      playAudioBlob(data.wav_base64);
+      playAudioBase64(data.wav_base64);
     }
 
-    function playAudioBlob(b64) {
-      const snd = new Audio("data:audio/wav;base64," + b64);
-      snd.play();
-      drawVisualizer();
-    }
+    // FFT & Oscilloscope Visualization Loop
+    function startVisualizerLoop() {
+      const scopeCanvas = document.getElementById('scope-canvas');
+      const sCtx = scopeCanvas.getContext('2d');
+      const fftCanvas = document.getElementById('fft-canvas');
+      const fCtx = fftCanvas.getContext('2d');
 
-    function synthesizeCarrier() {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-      osc.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.5);
-      drawVisualizer();
-    }
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      const timeArray = new Uint8Array(bufferLength);
 
-    function drawVisualizer() {
-      const canvas = document.getElementById('scope-canvas');
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#1a73e8';
-      ctx.beginPath();
-      const sliceWidth = canvas.width / 50;
-      let x = 0;
-      for (let i = 0; i < 50; i++) {
-        const v = Math.sin(i * 0.3 + Math.random() * 0.5) * 40 + canvas.height / 2;
-        if (i === 0) ctx.moveTo(x, v);
-        else ctx.lineTo(x, v);
-        x += sliceWidth;
+      function render() {
+        requestAnimationFrame(render);
+        analyser.getByteFrequencyData(dataArray);
+        analyser.getByteTimeDomainData(timeArray);
+
+        // 1. Mini Oscilloscope (Sidebar)
+        sCtx.fillStyle = '#0a0d14';
+        sCtx.fillRect(0, 0, scopeCanvas.width, scopeCanvas.height);
+        sCtx.lineWidth = 2;
+        sCtx.strokeStyle = '#1a73e8';
+        sCtx.beginPath();
+        const slice = scopeCanvas.width / bufferLength;
+        let sx = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const v = timeArray[i] / 128.0;
+          const y = (v * scopeCanvas.height) / 2;
+          if (i === 0) sCtx.moveTo(sx, y);
+          else sCtx.lineTo(sx, y);
+          sx += slice;
+        }
+        sCtx.stroke();
+
+        // 2. Main FFT Spectrum
+        fCtx.fillStyle = '#0a0d14';
+        fCtx.fillRect(0, 0, fftCanvas.width, fftCanvas.height);
+
+        const barWidth = (fftCanvas.width / bufferLength) * 2.5;
+        let barX = 0;
+        let maxVal = 0;
+        let maxIdx = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          const barHeight = (dataArray[i] / 255.0) * (fftCanvas.height - 20);
+          if (dataArray[i] > maxVal) {
+            maxVal = dataArray[i];
+            maxIdx = i;
+          }
+
+          const hue = (i / bufferLength) * 240;
+          fCtx.fillStyle = `hsl(${hue}, 80%, 55%)`;
+          fCtx.fillRect(barX, fftCanvas.height - barHeight - 10, barWidth - 1, barHeight);
+          barX += barWidth;
+        }
+
+        // Peak frequency in Hz
+        if (audioCtx && maxVal > 30) {
+          const peakHz = Math.round((maxIdx * audioCtx.sampleRate) / analyser.fftSize);
+          document.getElementById('fft-peak').innerText = `Peak Frequency: ${peakHz} Hz`;
+        }
       }
-      ctx.stroke();
+      render();
     }
-    drawVisualizer();
   </script>
 </body>
 </html>

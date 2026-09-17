@@ -63,3 +63,23 @@ def test_ui_index_html(live_server):
         content = resp.read().decode("utf-8")
         assert "<!DOCTYPE html>" in content
         assert "Google AudioCipher Studio" in content
+
+
+def test_api_dtmf_endpoints(live_server):
+    synth_req = json.dumps({"digits": "123#", "tone_duration": 0.08, "silence_duration": 0.04}).encode("utf-8")
+    req = urllib.request.Request(f"{live_server}/api/dtmf/synthesize", data=synth_req, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req) as resp:
+        assert resp.status == 200
+        data = json.loads(resp.read().decode("utf-8"))
+        assert data["status"] == "success"
+        assert data["digits"] == "123#"
+        wav_b64 = data["wav_base64"]
+
+    decode_req = json.dumps({"wav_base64": wav_b64, "tone_duration": 0.08, "silence_duration": 0.04}).encode("utf-8")
+    req2 = urllib.request.Request(f"{live_server}/api/dtmf/decode", data=decode_req, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req2) as resp:
+        assert resp.status == 200
+        dec_data = json.loads(resp.read().decode("utf-8"))
+        assert dec_data["status"] == "success"
+        assert dec_data["decoded_digits"] == "123#"
+
