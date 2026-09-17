@@ -141,6 +141,20 @@ class MCPServer:
                     "type": "object",
                     "properties": {}
                 }
+            },
+            {
+                "name": "audio_steganalysis",
+                "description": "Perform forensic statistical steganalysis on an audio carrier to detect LSB tampering, PoV equalization anomalies, and ultrasonic covert channels.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "carrier_wav_base64": {
+                            "type": "string",
+                            "description": "Base64 encoded WAV audio file to audit."
+                        }
+                    },
+                    "required": ["carrier_wav_base64"]
+                }
             }
         ]
 
@@ -306,6 +320,21 @@ class MCPServer:
                             "zero_dependencies": True,
                             "status": "HEALTHY"
                         }, indent=2)
+                    }
+                ]
+            }
+
+        elif tool_name == "audio_steganalysis":
+            from audiocipher_stego_engine.steganalysis import analyze_audio_steganography
+            wav_b64 = arguments["carrier_wav_base64"]
+            wav_bytes = base64.b64decode(wav_b64)
+            buf = AudioBuffer.from_wav_bytes(wav_bytes)
+            rep = analyze_audio_steganography(buf)
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": json.dumps(rep.to_dict(), indent=2)
                     }
                 ]
             }

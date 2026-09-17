@@ -322,6 +322,19 @@ class AudioCipherHTTPHandler(BaseHTTPRequestHandler):
             })
             return
 
+        elif path == "/api/steganalysis":
+            from audiocipher_stego_engine.steganalysis import analyze_audio_steganography
+            wav_b64 = body.get("carrier_wav_base64", "")
+            if not wav_b64:
+                carrier = AudioBuffer.generate_sine_tone(440.0, 1.0)
+            else:
+                wav_bytes = base64.b64decode(wav_b64)
+                carrier = AudioBuffer.from_wav_bytes(wav_bytes)
+
+            rep = analyze_audio_steganography(carrier)
+            self._send_json(rep.to_dict())
+            return
+
         self._send_json({"error": f"Endpoint not found: {path}"}, status=404)
 
     def log_message(self, format: str, *args: Any) -> None:

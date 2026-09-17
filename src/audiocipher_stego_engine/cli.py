@@ -88,6 +88,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_morse.add_argument("--freq", type=float, default=800.0, help="Tone frequency in Hz (default: 800)")
     p_morse.add_argument("--wpm", type=int, default=20, help="Words per minute (default: 20)")
 
+    # steganalysis
+    p_steg = sub.add_parser("steganalysis", parents=[base], help="Forensic statistical steganalysis and tamper detection on audio carrier")
+    p_steg.add_argument("carrier", help="Target WAV audio carrier to audit")
+    p_steg.add_argument("--json", action="store_true", help="Output forensic report as JSON")
+
     # serve
     p_serve = sub.add_parser("serve", parents=[base], help="Start AudioCipher Studio Web UI (Material 3 influenced)")
     p_serve.add_argument("--host", default="0.0.0.0", help="Host address (default: 0.0.0.0)")
@@ -181,6 +186,32 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"{c.GREEN}✓ Morse code audio synthesized:{c.RESET} {args.output}")
         print(f"  Notation: {c.CYAN}{morse_notation}{c.RESET}")
         print(f"  Duration: {audio.duration_seconds:.2f}s ({args.wpm} WPM, {args.freq} Hz)")
+        return 0
+
+    elif args.command == "steganalysis":
+        from audiocipher_stego_engine.steganalysis import analyze_audio_steganography
+        data = safe_read_bytes(args.carrier)
+        audio = AudioBuffer.from_wav_bytes(data)
+        rep = analyze_audio_steganography(audio)
+
+        if args.json:
+            import json
+            print(json.dumps(rep.to_dict(), indent=2))
+        else:
+            status_clr = c.RED if rep.stego_detected else c.GREEN
+            print(f"\n{c.BOLD}🔍 Audio Steganalysis & Carrier Forensics Report{c.RESET}")
+            print(f"  Verdict          : {status_clr}{rep.forensic_verdict}{c.RESET}")
+            print(f"  Stego Detected   : {status_clr}{rep.stego_detected}{c.RESET}")
+            print(f"  Confidence Score : {c.BOLD}{rep.confidence_score:.1f}%{c.RESET}")
+            print(f"  Detected Method  : {c.CYAN}{rep.detected_technique}{c.RESET}")
+            print(f"  Est. Payload     : {rep.estimated_payload_bytes} bytes ({rep.estimated_embedding_rate:.2%} carrier capacity)")
+            print(f"  PoV Chi-Square   : {rep.chi_square_statistic:.2f}")
+            print(f"  HF Energy Ratio  : {rep.high_freq_energy_ratio:.4f}")
+            if rep.anomalies:
+                print(f"\n  {c.BOLD}Carrier Forensic Findings:{c.RESET}")
+                for a in rep.anomalies:
+                    print(f"    • {a}")
+            print()
         return 0
 
     elif args.command == "serve":

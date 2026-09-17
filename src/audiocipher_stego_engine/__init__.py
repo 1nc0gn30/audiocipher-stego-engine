@@ -18,6 +18,10 @@ from audiocipher_stego_engine.spectrogram import (
     synthesize_spectrogram_watermark,
     text_to_morse,
 )
+from audiocipher_stego_engine.steganalysis import (
+    AudioSteganalysisReport,
+    analyze_audio_steganography,
+)
 from audiocipher_stego_engine.stego_engine import StegoEngine
 from audiocipher_stego_engine.wav_codec import AudioBuffer
 
@@ -37,5 +41,7 @@ __all__ = [
     "decode_dtmf_audio",
     "MCPServer",
     "run_mcp_server",
+    "AudioSteganalysisReport",
+    "analyze_audio_steganography",
 ]
 
