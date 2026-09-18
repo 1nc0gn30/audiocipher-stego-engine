@@ -5,6 +5,11 @@ Zero external runtime dependencies.
 
 from __future__ import annotations
 
+from audiocipher_stego_engine.acoustic_modem import (
+    FSKConfig,
+    demodulate_fsk,
+    modulate_fsk,
+)
 from audiocipher_stego_engine.crypto_core import (
     decrypt_payload,
     derive_audio_key,
@@ -39,6 +44,9 @@ __all__ = [
     "synthesize_spectrogram_watermark",
     "synthesize_dtmf_audio",
     "decode_dtmf_audio",
+    "FSKConfig",
+    "modulate_fsk",
+    "demodulate_fsk",
     "MCPServer",
     "run_mcp_server",
     "AudioSteganalysisReport",

@@ -11,6 +11,11 @@ import os
 import sys
 from typing import Any, List, Optional
 
+from audiocipher_stego_engine.acoustic_modem import (
+    FSKConfig,
+    demodulate_fsk,
+    modulate_fsk,
+)
 from audiocipher_stego_engine.compat import (
     atomic_write_bytes,
     atomic_write_text,
@@ -92,6 +97,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_steg = sub.add_parser("steganalysis", parents=[base], help="Forensic statistical steganalysis and tamper detection on audio carrier")
     p_steg.add_argument("carrier", help="Target WAV audio carrier to audit")
     p_steg.add_argument("--json", action="store_true", help="Output forensic report as JSON")
+
+    # modem
+    p_modem = sub.add_parser("modem", parents=[base], help="Acoustic BFSK modem data modulation/demodulation over sound")
+    p_modem.add_argument("mode", choices=["modulate", "demodulate"], help="Modem mode: 'modulate' or 'demodulate'")
+    p_modem.add_argument("input", help="Data string or input file (modulate) or WAV file (demodulate)")
+    p_modem.add_argument("-o", "--output", default=None, help="Output WAV path (modulate) or output payload file (demodulate)")
+    p_modem.add_argument("--baud", type=int, default=300, help="Baud rate (default: 300)")
+    p_modem.add_argument("--ultrasonic", action="store_true", help="Covert ultrasonic frequencies (>18 kHz)")
+    p_modem.add_argument("--json", action="store_true", help="Output JSON result / telemetry")
 
     # serve
     p_serve = sub.add_parser("serve", parents=[base], help="Start AudioCipher Studio Web UI (Material 3 influenced)")
@@ -213,6 +227,68 @@ def main(argv: Optional[List[str]] = None) -> int:
                     print(f"    • {a}")
             print()
         return 0
+
+    elif args.command == "modem":
+        cfg = FSKConfig(baud_rate=args.baud, ultrasonic=args.ultrasonic)
+        if args.mode == "modulate":
+            payload_data = safe_read_bytes(args.input) if os.path.isfile(args.input) else args.input.encode("utf-8")
+            audio = modulate_fsk(payload_data, cfg)
+            out_file = args.output or ("modem_ultrasonic.wav" if args.ultrasonic else "modem.wav")
+            atomic_write_bytes(out_file, audio.to_wav_bytes())
+
+            if args.json:
+                import json
+                print(json.dumps({
+                    "status": "success",
+                    "output_file": out_file,
+                    "duration_seconds": round(audio.duration_seconds, 2),
+                    "baud_rate": args.baud,
+                    "ultrasonic": args.ultrasonic,
+                    "payload_length_bytes": len(payload_data)
+                }, indent=2))
+            else:
+                band_desc = "Ultrasonic (>18kHz)" if args.ultrasonic else "Audible BFSK (1200/2200 Hz)"
+                print(f"{c.GREEN}✓ Data modulated to acoustic BFSK carrier:{c.RESET} {out_file}")
+                print(f"  Carrier Band: {c.CYAN}{band_desc}{c.RESET} | Baud Rate: {args.baud} baud")
+                print(f"  Duration: {audio.duration_seconds:.2f}s | Payload Size: {len(payload_data)} bytes")
+            return 0
+
+        elif args.mode == "demodulate":
+            wav_bytes = safe_read_bytes(args.input)
+            audio = AudioBuffer.from_wav_bytes(wav_bytes)
+
+            try:
+                decoded_bytes, telemetry = demodulate_fsk(audio, cfg)
+                text = decoded_bytes.decode("utf-8", errors="replace")
+
+                if args.output:
+                    atomic_write_bytes(args.output, decoded_bytes)
+
+                if args.json:
+                    import json
+                    print(json.dumps({
+                        "status": "success",
+                        "decoded_text": text,
+                        "telemetry": telemetry
+                    }, indent=2))
+                else:
+                    print(f"\n{c.BOLD}📡 Acoustic Modem Demodulation Report{c.RESET}")
+                    print(f"  Status        : {c.GREEN}VALID CRC-16 VERIFIED{c.RESET}")
+                    print(f"  Decoded Size  : {len(decoded_bytes)} bytes")
+                    print(f"  Baud Rate     : {telemetry['baud_rate']} baud")
+                    print(f"  Estimated SNR : {telemetry['estimated_snr_db']} dB")
+                    print(f"  CRC-16 Hex    : {telemetry['crc16_hex']}")
+                    print(f"  Payload Text  : {c.CYAN}{text}{c.RESET}\n")
+                    if args.output:
+                        print(f"{c.GREEN}✓ Decoded payload written to:{c.RESET} {args.output}")
+                return 0
+            except Exception as e:
+                if args.json:
+                    import json
+                    print(json.dumps({"status": "error", "message": str(e)}, indent=2))
+                else:
+                    print(f"{c.RED}Error: Demodulation failed: {str(e)}{c.RESET}")
+                return 1
 
     elif args.command == "serve":
         server = run_ui_server(args.host, args.port)

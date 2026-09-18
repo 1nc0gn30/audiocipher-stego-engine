@@ -332,6 +332,10 @@
           <div class="mode-name">Morse Code Synthesizer</div>
           <div class="mode-desc">Standard ITU Morse acoustic PCM generator</div>
         </div>
+        <div class="mode-item" onclick="switchMode('modem')">
+          <div class="mode-name">FSK Acoustic Modem</div>
+          <div class="mode-desc">Audible & ultrasonic data over sound</div>
+        </div>
       </div>
 
       <div class="section-title" style="margin-top:0.5rem;">Web Audio Live Scope</div>
@@ -431,6 +435,40 @@
         <div class="result-box" id="morse-result">Ready for Morse synthesis.</div>
       </div>
 
+      <!-- Acoustic BFSK Modem Panel -->
+      <div class="card" id="panel-modem" style="display:none;">
+        <div class="section-title">Acoustic BFSK Modem & Ultrasonic Air-Gap Data Transfer</div>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">
+          Transmit binary data through physical air gaps using Continuous-Phase Binary Frequency Shift Keying (CPFSK) with UART framing and CRC-16 integrity validation.
+        </p>
+        <div class="form-group">
+          <label>Payload Text</label>
+          <textarea id="modem-payload" rows="3">CONFIDENTIAL AGENT DIRECTIVE // AIR-GAP TRANSMISSION #9</textarea>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label>Baud Rate</label>
+            <select id="modem-baud" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+              <option value="300" selected>300 baud (High robustness / long range)</option>
+              <option value="600">600 baud (Standard acoustic transmission)</option>
+              <option value="1200">1200 baud (High speed acoustic)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Transmission Carrier Band</label>
+            <select id="modem-band" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+              <option value="audible" selected>Audible Bell 202 (1200 Hz Mark / 2200 Hz Space)</option>
+              <option value="ultrasonic">Covert Ultrasonic (18.5 kHz Mark / 20.0 kHz Space)</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex; gap:0.75rem;">
+          <button class="btn-primary" onclick="runFskModulate()">📡 Modulate & Play Audio</button>
+          <button class="btn-primary" style="background:#5f6368;" onclick="runFskDemodulate()">🔍 Demodulate Audio</button>
+        </div>
+        <div class="result-box" id="modem-result">Ready for acoustic BFSK modem modulation or demodulation.</div>
+      </div>
+
       <!-- Audio Spectrogram Waterfall & Spectrum Visualizer -->
       <div class="card">
         <div class="section-title" style="display:flex; justify-content:space-between;">
@@ -465,6 +503,7 @@
       document.getElementById('panel-stego').style.display = m === 'stego' ? 'block' : 'none';
       document.getElementById('panel-dtmf').style.display = m === 'dtmf' ? 'block' : 'none';
       document.getElementById('panel-morse').style.display = m === 'morse' ? 'block' : 'none';
+      document.getElementById('panel-modem').style.display = m === 'modem' ? 'block' : 'none';
     }
 
     function initAudioContext() {
@@ -649,6 +688,45 @@
       lastWavB64 = data.wav_base64;
       document.getElementById('morse-result').innerText = `Morse: ${data.morse_notation}\nDuration: ${data.duration_seconds}s`;
       playAudioBase64(data.wav_base64);
+    }
+
+    // FSK Acoustic Modem Handlers
+    async function runFskModulate() {
+      const payload = document.getElementById('modem-payload').value;
+      const baud = parseInt(document.getElementById('modem-baud').value);
+      const ultrasonic = document.getElementById('modem-band').value === 'ultrasonic';
+
+      const resp = await fetch('/api/fsk-modulate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({payload, baud_rate: baud, ultrasonic})
+      });
+      const data = await resp.json();
+      lastWavB64 = data.wav_base64;
+      document.getElementById('modem-result').innerText = `✓ BFSK MODULATED (${data.duration_seconds}s Audio, ${data.baud_rate} Baud)\nBand: ${ultrasonic ? 'Ultrasonic (>18kHz)' : 'Audible (1200/2200 Hz)'}\nMark: ${data.mark_frequency_hz} Hz | Space: ${data.space_frequency_hz} Hz\nTotal Samples: ${data.total_samples}`;
+      playAudioBase64(lastWavB64);
+    }
+
+    async function runFskDemodulate() {
+      if (!lastWavB64) {
+        alert('Please modulate an acoustic signal first.');
+        return;
+      }
+      const baud = parseInt(document.getElementById('modem-baud').value);
+      const ultrasonic = document.getElementById('modem-band').value === 'ultrasonic';
+
+      const resp = await fetch('/api/fsk-demodulate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({wav_base64: lastWavB64, baud_rate: baud, ultrasonic})
+      });
+      const data = await resp.json();
+      if (data.status === 'success') {
+        const t = data.telemetry;
+        document.getElementById('modem-result').innerText = `✓ RECOVERED PAYLOAD: "${data.decoded_text}"\nCRC-16: ${t.crc16_hex} (VALID)\nEstimated SNR: ${t.estimated_snr_db} dB | Bit Clock Offset: ${t.bit_clock_offset_samples} samples`;
+      } else {
+        document.getElementById('modem-result').innerText = `❌ Error: ${data.message}`;
+      }
     }
 
     // FFT & Oscilloscope Visualization Loop

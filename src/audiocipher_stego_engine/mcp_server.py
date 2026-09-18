@@ -12,6 +12,11 @@ import os
 import sys
 from typing import Any, Dict, List, Optional
 
+from audiocipher_stego_engine.acoustic_modem import (
+    FSKConfig,
+    demodulate_fsk,
+    modulate_fsk,
+)
 from audiocipher_stego_engine.crypto_core import (
     decrypt_payload,
     derive_audio_key,
@@ -154,6 +159,70 @@ class MCPServer:
                         }
                     },
                     "required": ["carrier_wav_base64"]
+                }
+            },
+            {
+                "name": "audio_modulate_fsk",
+                "description": "Modulate data payload into an acoustic BFSK waveform with CRC-16 framing for transmission over sound (audible or ultrasonic).",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "payload": {
+                            "type": "string",
+                            "description": "Data payload text to transmit over acoustic modem."
+                        },
+                        "baud_rate": {
+                            "type": "integer",
+                            "default": 300,
+                            "description": "Transmission baud rate (e.g. 300 or 600)."
+                        },
+                        "ultrasonic": {
+                            "type": "boolean",
+                            "default": False,
+                            "description": "Use inaudible ultrasonic carrier frequencies (>18kHz) for covert air-gap transfer."
+                        },
+                        "mark_freq": {
+                            "type": "number",
+                            "description": "Optional custom mark frequency (Hz) for binary 1."
+                        },
+                        "space_freq": {
+                            "type": "number",
+                            "description": "Optional custom space frequency (Hz) for binary 0."
+                        }
+                    },
+                    "required": ["payload"]
+                }
+            },
+            {
+                "name": "audio_demodulate_fsk",
+                "description": "Demodulate an acoustic BFSK audio recording using matched-filter energy detection to recover the payload and verify CRC-16.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "audio_wav_base64": {
+                            "type": "string",
+                            "description": "Base64 encoded WAV audio file containing BFSK transmission."
+                        },
+                        "baud_rate": {
+                            "type": "integer",
+                            "default": 300,
+                            "description": "Transmission baud rate (e.g. 300 or 600)."
+                        },
+                        "ultrasonic": {
+                            "type": "boolean",
+                            "default": False,
+                            "description": "Whether transmission used ultrasonic carrier frequencies."
+                        },
+                        "mark_freq": {
+                            "type": "number",
+                            "description": "Optional custom mark frequency (Hz)."
+                        },
+                        "space_freq": {
+                            "type": "number",
+                            "description": "Optional custom space frequency (Hz)."
+                        }
+                    },
+                    "required": ["audio_wav_base64"]
                 }
             }
         ]
@@ -338,6 +407,84 @@ class MCPServer:
                     }
                 ]
             }
+
+        elif tool_name == "audio_modulate_fsk":
+            payload = arguments["payload"]
+            baud = int(arguments.get("baud_rate", 300))
+            ultra = bool(arguments.get("ultrasonic", False))
+
+            cfg_kwargs: Dict[str, Any] = {"baud_rate": baud, "ultrasonic": ultra}
+            if "mark_freq" in arguments:
+                cfg_kwargs["mark_freq"] = float(arguments["mark_freq"])
+            if "space_freq" in arguments:
+                cfg_kwargs["space_freq"] = float(arguments["space_freq"])
+
+            cfg = FSKConfig(**cfg_kwargs)
+            audio = modulate_fsk(payload, cfg)
+            wav_bytes = audio.to_wav_bytes()
+
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": json.dumps({
+                            "status": "success",
+                            "wav_base64": base64.b64encode(wav_bytes).decode("ascii"),
+                            "duration_seconds": round(audio.duration_seconds, 2),
+                            "baud_rate": baud,
+                            "ultrasonic": ultra,
+                            "mark_frequency_hz": cfg.mark_freq,
+                            "space_frequency_hz": cfg.space_freq,
+                            "total_samples": len(audio.samples)
+                        }, indent=2)
+                    }
+                ]
+            }
+
+        elif tool_name == "audio_demodulate_fsk":
+            wav_b64 = arguments["audio_wav_base64"]
+            baud = int(arguments.get("baud_rate", 300))
+            ultra = bool(arguments.get("ultrasonic", False))
+
+            cfg_kwargs: Dict[str, Any] = {"baud_rate": baud, "ultrasonic": ultra}
+            if "mark_freq" in arguments:
+                cfg_kwargs["mark_freq"] = float(arguments["mark_freq"])
+            if "space_freq" in arguments:
+                cfg_kwargs["space_freq"] = float(arguments["space_freq"])
+
+            cfg = FSKConfig(**cfg_kwargs)
+            wav_bytes = base64.b64decode(wav_b64)
+            audio = AudioBuffer.from_wav_bytes(wav_bytes)
+
+            try:
+                decoded_bytes, telemetry = demodulate_fsk(audio, cfg)
+                text = decoded_bytes.decode("utf-8", errors="replace")
+                return {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": json.dumps({
+                                "status": "success",
+                                "decoded_text": text,
+                                "decoded_base64": base64.b64encode(decoded_bytes).decode("ascii"),
+                                "telemetry": telemetry
+                            }, indent=2)
+                        }
+                    ]
+                }
+            except Exception as e:
+                return {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": json.dumps({
+                                "status": "error",
+                                "message": str(e)
+                            }, indent=2)
+                        }
+                    ],
+                    "isError": True
+                }
 
         raise ValueError(f"Unknown tool: {tool_name}")
 

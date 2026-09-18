@@ -13,6 +13,7 @@
 ## ✨ Features
 
 - 🔒 **Audio-Keyed Authenticated Encryption**: Derives 256-bit cryptographic keys using PBKDF2-HMAC-SHA256 from raw acoustic waveforms and precise decibel/volume modifiers. Encrypts payloads using authenticated keystream cipher + HMAC-SHA256 integrity tags.
+- 📡 **BFSK Acoustic Modem & Ultrasonic Covert Air-Gap Transfer**: Transmit data through physical air gaps via continuous-phase binary frequency shift keying (CPFSK). Supports audible Kansas City / Bell 202 frequencies (1200/2200 Hz) and covert ultrasonic frequencies (>18 kHz) with UART framing, CRC-16-CCITT validation, and matched-filter energy demodulation.
 - 🛡️ **PCM Audio Steganography**: Embeds secret files and strings into the least significant bits (LSB) of uncompressed 16-bit PCM WAV audio carriers with CRC32 integrity checksum validation and magic header verification.
 - 📻 **Acoustic Morse Code & Spectrogram Synthesizer**: Converts text messages into audible Morse code tone sequences and multi-frequency spectrogram visual patterns at configurable speed (WPM) and frequency (Hz).
 - 🎨 **AudioCipher Studio Web UI**: Real-time Web Audio API oscilloscope visualizer, interactive audio cipher ritual runner, drag-and-drop stego carrier injector, and 1-click WAV export (design influenced by Material 3 tokens).
@@ -53,6 +54,15 @@ audiocipher extract stego.wav -o recovered_secret.txt
 # Synthesize Morse code audio WAV from plaintext message
 audiocipher morse "SOS SOVEREIGN AGENT 757" --freq 800 --wpm 20 -o morse.wav
 
+# Transmit data over audible BFSK acoustic modem (1200/2200 Hz)
+audiocipher modem modulate "AIRGAP DIRECTIVE #42" -o modem.wav --baud 300
+
+# Transmit data over covert ultrasonic acoustic modem (>18 kHz, inaudible)
+audiocipher modem modulate "COVERT TOP SECRET" -o modem_ultra.wav --ultrasonic --baud 600
+
+# Demodulate acoustic modem recording and verify CRC-16
+audiocipher modem demodulate modem.wav -o received.txt
+
 # Launch AudioCipher Studio Web UI (Material 3 influenced)
 audiocipher serve --port 8096
 
@@ -86,6 +96,9 @@ Add `audiocipher-stego-engine` to your Claude Desktop or Cursor configuration:
 - `audio_stego_embed`: Hide payload inside a WAV carrier using LSB steganography.
 - `audio_stego_extract`: Extract hidden payload from a WAV carrier.
 - `audio_morse_synthesize`: Generate a synthesized Morse code WAV audio buffer from plaintext.
+- `audio_steganalysis`: Forensic statistical audit for LSB and spectral stego tampering.
+- `audio_modulate_fsk`: Modulate data into audible or ultrasonic BFSK waveform with CRC-16 framing.
+- `audio_demodulate_fsk`: Demodulate BFSK audio, recover payload, verify CRC-16, and report SNR telemetry.
 - `audio_diagnostics`: Platform and toolchain health check.
 
 ---
@@ -121,6 +134,22 @@ PCM audio samples encode payload bits into the least significant bit of each 16-
 +------------------+---------------------+-------------------+------------------+
 ```
 
+### 4. Continuous-Phase BFSK & Matched-Filter Energy Demodulation
+Binary Frequency Shift Keying (BFSK) encodes bit $b \in \{0, 1\}$ as instantaneous frequency $f(t)$:
+
+$$f(t) = \begin{cases} f_{\text{mark}} & \text{if } b = 1 \\ f_{\text{space}} & \text{if } b = 0 \end{cases}$$
+
+Phase continuity is preserved across bit transitions to eliminate spectral splatter:
+
+$$\phi[n] = \left(\phi[n-1] + \frac{2\pi f[n]}{f_s}\right) \pmod{2\pi}, \quad s[n] = A \sin(\phi[n])$$
+
+At the demodulator, matched-filter energy quadrature correlation calculates the spectral power at $f_{\text{mark}}$ and $f_{\text{space}}$ over symbol window $N = \lfloor f_s / \text{baud} \rfloor$:
+
+$$E_{\text{mark}} = \left(\sum_{n=0}^{N-1} x[n] \cos\left(\frac{2\pi f_m n}{f_s}\right)\right)^2 + \left(\sum_{n=0}^{N-1} x[n] \sin\left(\frac{2\pi f_m n}{f_s}\right)\right)^2$$
+$$E_{\text{space}} = \left(\sum_{n=0}^{N-1} x[n] \cos\left(\frac{2\pi f_s n}{f_s}\right)\right)^2 + \left(\sum_{n=0}^{N-1} x[n] \sin\left(\frac{2\pi f_s n}{f_s}\right)\right)^2$$
+
+Bit decision $\hat{b} = \mathbb{I}(E_{\text{mark}} \ge E_{\text{space}})$. Packets are framed with preamble `0x55` sync, frame delimiter `0x7E`, 16-bit length header, payload bytes, and CRC-16-CCITT polynomial $x^{16} + x^{12} + x^5 + 1$.
+
 ---
 
 ## 🏛️ Architecture
@@ -131,6 +160,7 @@ flowchart TD
         Wav["PCM WAV Codec\n(8/16-bit Uncompressed)"]
         Crypto["🔐 Audio-Keyed Cipher\n(PBKDF2 + Keystream + HMAC)"]
         Stego["🛡️ LSB Steganographer\n(CRC32 + Header Guard)"]
+        Modem["📡 BFSK Acoustic Modem\n(Audible & Ultrasonic Air-Gap)"]
         Spectro["📻 Morse & DTMF Synthesizer\n(Goertzel Tone Detector)"]
     end
 
@@ -142,9 +172,11 @@ flowchart TD
 
     Wav --> Crypto
     Wav --> Stego
+    Wav --> Modem
     Wav --> Spectro
     Crypto --> Channels
     Stego --> Channels
+    Modem --> Channels
     Spectro --> Channels
 ```
 
@@ -153,23 +185,30 @@ flowchart TD
 ## 🐍 Python SDK API Reference
 
 ```python
+from audiocipher_stego_engine.acoustic_modem import FSKConfig, modulate_fsk, demodulate_fsk
 from audiocipher_stego_engine.crypto_core import derive_audio_key, encrypt_payload, decrypt_payload
 from audiocipher_stego_engine.spectrogram import synthesize_dtmf_audio, decode_dtmf_audio, synthesize_morse_audio
 from audiocipher_stego_engine.stego_engine import StegoEngine
 from audiocipher_stego_engine.wav_codec import AudioBuffer
 
-# 1. Synthesize and decode DTMF phone key sequence
+# 1. Transmit and recover data via BFSK acoustic modem (audible or ultrasonic)
+cfg = FSKConfig(baud_rate=300, ultrasonic=True)
+audio = modulate_fsk(b"COVERT AIRGAP PAYLOAD", cfg)
+decoded_bytes, telemetry = demodulate_fsk(audio, cfg)
+print(f"Recovered: {decoded_bytes.decode('utf-8')}, SNR: {telemetry['estimated_snr_db']} dB")
+
+# 2. Synthesize and decode DTMF phone key sequence
 dtmf_audio = synthesize_dtmf_audio("8675309#")
 decoded_digits = decode_dtmf_audio(dtmf_audio)
 print(f"Decoded DTMF: {decoded_digits}")  # "8675309#"
 
-# 2. Hide secret data in a carrier WAV
+# 3. Hide secret data in a carrier WAV
 carrier = AudioBuffer.generate_carrier_chord([440.0, 554.37, 659.25], duration=2.0)
 stego_audio = StegoEngine.embed_lsb(carrier, b"CLASSIFIED_PAYLOAD_99")
 recovered = StegoEngine.extract_lsb(stego_audio)
 print(f"Recovered: {recovered.decode('utf-8')}")
 
-# 3. Acoustic-keyed authenticated encryption
+# 4. Acoustic-keyed authenticated encryption
 tone = AudioBuffer.generate_sine_tone(440.0, 1.0)
 key, salt = derive_audio_key(tone.to_wav_bytes(), volume_db=50.0)
 ciphertext = encrypt_payload(b"Agent Directive", key, salt)

@@ -14,6 +14,11 @@ import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict, Optional
 
+from audiocipher_stego_engine.acoustic_modem import (
+    FSKConfig,
+    demodulate_fsk,
+    modulate_fsk,
+)
 from audiocipher_stego_engine.crypto_core import (
     decrypt_payload,
     derive_audio_key,
@@ -333,6 +338,61 @@ class AudioCipherHTTPHandler(BaseHTTPRequestHandler):
 
             rep = analyze_audio_steganography(carrier)
             self._send_json(rep.to_dict())
+            return
+
+        elif path == "/api/fsk-modulate":
+            payload = body.get("payload", "")
+            baud = int(body.get("baud_rate", 300))
+            ultra = bool(body.get("ultrasonic", False))
+
+            cfg_kwargs: Dict[str, Any] = {"baud_rate": baud, "ultrasonic": ultra}
+            if "mark_freq" in body:
+                cfg_kwargs["mark_freq"] = float(body["mark_freq"])
+            if "space_freq" in body:
+                cfg_kwargs["space_freq"] = float(body["space_freq"])
+
+            cfg = FSKConfig(**cfg_kwargs)
+            audio = modulate_fsk(payload, cfg)
+            wav_bytes = audio.to_wav_bytes()
+
+            self._send_json({
+                "status": "success",
+                "wav_base64": base64.b64encode(wav_bytes).decode("ascii"),
+                "duration_seconds": round(audio.duration_seconds, 2),
+                "baud_rate": baud,
+                "ultrasonic": ultra,
+                "mark_frequency_hz": cfg.mark_freq,
+                "space_frequency_hz": cfg.space_freq,
+                "total_samples": len(audio.samples)
+            })
+            return
+
+        elif path == "/api/fsk-demodulate":
+            wav_b64 = body.get("wav_base64", "")
+            baud = int(body.get("baud_rate", 300))
+            ultra = bool(body.get("ultrasonic", False))
+
+            cfg_kwargs: Dict[str, Any] = {"baud_rate": baud, "ultrasonic": ultra}
+            if "mark_freq" in body:
+                cfg_kwargs["mark_freq"] = float(body["mark_freq"])
+            if "space_freq" in body:
+                cfg_kwargs["space_freq"] = float(body["space_freq"])
+
+            cfg = FSKConfig(**cfg_kwargs)
+            try:
+                wav_bytes = base64.b64decode(wav_b64)
+                audio = AudioBuffer.from_wav_bytes(wav_bytes)
+                decoded_bytes, telemetry = demodulate_fsk(audio, cfg)
+                text = decoded_bytes.decode("utf-8", errors="replace")
+
+                self._send_json({
+                    "status": "success",
+                    "decoded_text": text,
+                    "decoded_base64": base64.b64encode(decoded_bytes).decode("ascii"),
+                    "telemetry": telemetry
+                })
+            except Exception as e:
+                self._send_json({"status": "error", "message": str(e)}, status=400)
             return
 
         self._send_json({"error": f"Endpoint not found: {path}"}, status=404)
