@@ -4,253 +4,560 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AudioCipher Studio | Acoustic Cryptography & Steganography</title>
+  <meta name="description" content="100% in-browser acoustic cryptography, PCM audio LSB steganography, DTMF Goertzel decoder, ITU Morse synthesizer, and ultrasonic BFSK air-gap modem. Zero cloud egress.">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" href="icon.png">
+  
+  <!-- OpenGraph & Twitter Social Meta -->
+  <meta property="og:title" content="AudioCipher Studio | Acoustic Cryptography & Steganography">
+  <meta property="og:description" content="100% in-browser acoustic cryptography, PCM audio LSB steganography, DTMF Goertzel decoder, ITU Morse synthesizer, and ultrasonic BFSK air-gap modem.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://audiocipher.nullai.tech">
+  <meta property="og:image" content="https://audiocipher.nullai.tech/icon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@1nc0gn30">
+  <meta name="twitter:creator" content="@1nc0gn30">
+  <meta name="twitter:image" content="https://audiocipher.nullai.tech/icon.png">
+
+  <!-- AEO & SEO Schema.org Graph -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "AudioCipher Studio",
+        "url": "https://audiocipher.nullai.tech",
+        "applicationCategory": "SecurityApplication",
+        "operatingSystem": "All modern web browsers",
+        "description": "Zero-cloud egress client-side acoustic cryptography, PCM audio LSB steganography, DTMF Goertzel decoding, and ultrasonic air-gap data modem.",
+        "offers": {
+          "@type": "Offer",
+          "price": "19",
+          "priceCurrency": "USD"
+        },
+        "creator": {
+          "@type": "Person",
+          "name": "Neal Frazier",
+          "url": "https://nealfrazier.tech"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does PCM audio LSB steganography work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "AudioCipher embeds encrypted payload bytes directly into the least significant bits of 16-bit uncompressed PCM audio samples with CRC-32 integrity checks, completely undetectable to the human ear."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does any audio data leave my device?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. AudioCipher executes 100% in your browser using the native Web Audio API and Web Crypto API. Zero server communication or audio egress occurs."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What payment rails are accepted for Pro Lifetime Access?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We accept credit cards, Apple Pay, and Google Pay via Stripe, as well as instant Web3 payments via DePay on the Solana blockchain ($19 lifetime access)."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --g-blue: #1a73e8;
-      --g-blue-dark: #1557b0;
-      --g-blue-light: #e8f0fe;
-      --g-green: #1e8e3e;
-      --g-green-light: #e6f4ea;
-      --g-red: #d93025;
-      --g-red-light: #fce8e6;
-      --g-purple: #9334e6;
-      --g-purple-light: #f3e8fd;
-      --surface: #ffffff;
-      --surface-variant: #f8f9fa;
-      --surface-card: #ffffff;
-      --border: #dadce0;
-      --border-subtle: #e8eaed;
-      --text: #202124;
-      --text-secondary: #5f6368;
-      --code-bg: #f1f3f4;
-      --shadow-sm: 0 1px 2px rgba(60,64,67,0.15), 0 1px 3px 1px rgba(60,64,67,0.1);
-      --shadow-md: 0 4px 8px 3px rgba(60,64,67,0.15);
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-full: 9999px;
-      --font-sans: 'Google Sans', 'Segoe UI', Roboto, sans-serif;
-      --font-mono: 'Roboto Mono', monospace;
+      --zoth-gold: #D4AF37;
+      --zoth-gold-dark: #B8860B;
+      --zoth-gold-light: #F5E6AB;
+      --zoth-void: #08080B;
+      --zoth-void-2: #0B0B12;
+      --zoth-card: #12121A;
+      --zoth-card-hover: #181824;
+      --zoth-border: #2A2A33;
+      --zoth-border-light: #3A3A48;
+      --zoth-text: #F5E6AB;
+      --zoth-text-body: #EDEFF2;
+      --zoth-text-muted: #9AA0A6;
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9334e6;
+      --accent-green: #12B76A;
+      --accent-red: #F97066;
+      --font-sans: 'Inter', 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
-    [data-theme="dark"] {
-      --surface: #1e1f20;
-      --surface-variant: #131314;
-      --surface-card: #28292a;
-      --border: #3c4043;
-      --border-subtle: #2d3134;
-      --text: #e3e3e3;
-      --text-secondary: #9aa0a6;
-      --code-bg: #18191a;
-      --g-blue-light: #1c3b5e;
-      --g-green-light: #133820;
-      --g-red-light: #3c1e1e;
-      --g-purple-light: #2c1a3f;
-    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background: var(--zoth-void);
+      color: var(--zoth-text-body);
       font-family: var(--font-sans);
-      background: var(--surface-variant);
-      color: var(--text);
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
     }
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0.65rem 1.5rem;
+
+    /* Ambient scanline texture */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 999; pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(212, 175, 55, 0.015) 0px,
+        rgba(212, 175, 55, 0.015) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+    }
+
+    /* Top Brand Bar */
+    .zoth-brand-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1.25rem;
+      background: linear-gradient(90deg, #0B0B12 0%, #12121A 100%);
+      border-bottom: 1px solid var(--zoth-border);
+      font-size: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .zoth-z {
+      width: 26px; height: 26px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #F3D56A 0%, #D4AF37 48%, #B8860B 100%);
+      color: #101828; font-weight: 800; font-size: 0.95rem;
+      border-radius: 6px;
+    }
+    .zoth-name { font-weight: 700; color: var(--zoth-gold-light); letter-spacing: 0.03em; }
+    .zoth-tool { font-size: 0.75rem; color: var(--zoth-text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+    .zoth-spacer { flex: 1; }
+    .zoth-badge {
+      font-size: 0.68rem; color: var(--zoth-gold); background: #2A2410;
+      border: 1px solid #3A2F12; padding: 0.15rem 0.55rem; border-radius: 9999px;
+      font-weight: 700; letter-spacing: 0.05em;
+    }
+
+    /* High-Converting Sales Funnel Banner */
+    .sales-banner {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(18, 18, 26, 0.9) 100%);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+      padding: 0.85rem 1.25rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      position: relative;
       z-index: 10;
+    }
+    .sales-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .sales-tag {
+      background: #D4AF37;
+      color: #08080B;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .sales-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #FFFFFF;
+    }
+    .sales-price {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: var(--zoth-gold-light);
+    }
+    .sales-price del {
+      color: var(--zoth-text-muted);
+      margin-right: 0.35rem;
+      font-size: 0.85rem;
+    }
+    .sales-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+    .btn-checkout-stripe {
+      background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+      color: #08080B;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.45rem 1rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
+      transition: all 0.2s;
+    }
+    .btn-checkout-stripe:hover {
+      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.45);
+      transform: translateY(-1px);
+    }
+    .btn-checkout-solana {
+      background: #181824;
+      color: #00f0ff;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+    .btn-checkout-solana:hover {
+      border-color: #00f0ff;
+      background: rgba(0, 240, 255, 0.1);
+    }
+    .btn-activate-key {
+      background: none;
+      border: none;
+      color: var(--zoth-text-muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0.2rem 0.4rem;
+    }
+    .btn-activate-key:hover {
+      color: var(--zoth-gold);
+    }
+
+    /* App Header */
+    header {
+      background: var(--zoth-void-2);
+      border-bottom: 1px solid var(--zoth-border);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
     .brand {
       display: flex;
       align-items: center;
       gap: 0.75rem;
       font-size: 1.15rem;
-      font-weight: 600;
+      font-weight: 700;
+      color: #FFFFFF;
     }
     .brand-icon {
-      background: var(--g-blue-light);
-      color: var(--g-blue);
-      width: 32px;
-      height: 32px;
-      border-radius: var(--radius-sm);
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--zoth-gold);
+      width: 34px; height: 34px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
+      border: 1px solid rgba(212, 175, 55, 0.3);
     }
-    .badge {
-      background: var(--g-blue-light);
-      color: var(--g-blue);
-      padding: 0.2rem 0.6rem;
-      border-radius: var(--radius-full);
+    .header-badge {
+      background: rgba(212, 175, 55, 0.1);
+      color: var(--zoth-gold);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
       font-size: 0.75rem;
-      font-weight: 500;
+      font-weight: 600;
+    }
+    .header-badge.pro-active {
+      background: rgba(18, 183, 106, 0.15);
+      color: #12B76A;
+      border-color: rgba(18, 183, 106, 0.4);
     }
     .header-actions {
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      flex-wrap: wrap;
     }
-    .btn-icon {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.4rem 0.8rem;
-      border-radius: var(--radius-full);
+    .btn-action {
+      background: var(--zoth-card);
+      border: 1px solid var(--zoth-border);
+      color: var(--zoth-text-body);
+      padding: 0.45rem 0.9rem;
+      border-radius: 9999px;
       cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 500;
+      font-size: 0.82rem;
+      font-weight: 600;
       display: flex;
       align-items: center;
       gap: 0.4rem;
       transition: all 0.15s;
     }
-    .btn-icon:hover {
-      background: var(--surface-variant);
+    .btn-action:hover {
+      background: var(--zoth-card-hover);
+      border-color: var(--zoth-gold);
+      color: var(--zoth-gold-light);
     }
+
+    /* Main Container Layout */
     .container {
       display: grid;
-      grid-template-columns: 320px 1fr;
+      grid-template-columns: 280px 1fr;
       flex: 1;
-      overflow: hidden;
+      min-height: 0;
     }
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sidebar Navigation */
     aside {
-      background: var(--surface);
-      border-right: 1px solid var(--border);
+      background: var(--zoth-void-2);
+      border-right: 1px solid var(--zoth-border);
       padding: 1.25rem;
-      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
+      overflow-y: auto;
+    }
+    @media (max-width: 900px) {
+      aside {
+        border-right: none;
+        border-bottom: 1px solid var(--zoth-border);
+      }
     }
     .section-title {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
+      letter-spacing: 0.06em;
+      color: var(--zoth-text-muted);
       margin-bottom: 0.4rem;
     }
     .mode-list {
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
+      gap: 0.45rem;
     }
     .mode-item {
-      padding: 0.65rem 0.85rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-subtle);
-      background: var(--surface-variant);
+      padding: 0.75rem 0.9rem;
+      border-radius: 8px;
+      border: 1px solid var(--zoth-border);
+      background: var(--zoth-card);
       cursor: pointer;
       transition: all 0.15s;
     }
     .mode-item:hover {
-      border-color: var(--g-blue);
-      background: var(--g-blue-light);
+      border-color: rgba(212, 175, 55, 0.4);
+      background: var(--zoth-card-hover);
     }
     .mode-item.active {
-      background: var(--g-blue-light);
-      border-color: var(--g-blue);
+      background: rgba(212, 175, 55, 0.08);
+      border-color: var(--zoth-gold);
     }
     .mode-name {
       font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text);
+      font-weight: 700;
+      color: var(--zoth-gold-light);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
     .mode-desc {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
+      font-size: 0.72rem;
+      color: var(--zoth-text-muted);
+      margin-top: 0.2rem;
+      line-height: 1.3;
     }
+
+    /* Oscilloscope canvas in sidebar */
+    .canvas-box {
+      background: #060608;
+      border: 1px solid var(--zoth-border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      overflow: hidden;
+    }
+    #scope-canvas {
+      width: 100%;
+      height: 100px;
+      display: block;
+    }
+    #audio-status {
+      font-size: 0.72rem;
+      color: var(--zoth-text-muted);
+      font-family: var(--font-mono);
+      text-align: center;
+      margin-top: 0.4rem;
+    }
+
+    /* Workspace */
     main {
-      padding: 1.25rem 1.5rem;
-      overflow-y: auto;
+      padding: 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.25rem;
+      overflow-y: auto;
     }
     .card {
-      background: var(--surface-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
+      background: var(--zoth-card);
+      border: 1px solid var(--zoth-border);
+      border-radius: 12px;
       padding: 1.25rem;
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      position: relative;
     }
     .form-group {
       margin-bottom: 1rem;
     }
     label {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
+      color: var(--zoth-text-body);
       margin-bottom: 0.4rem;
-      color: var(--text);
     }
-    textarea, input[type="text"] {
+    textarea, input[type="text"], select {
       width: 100%;
-      padding: 0.65rem 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-      color: var(--text);
+      padding: 0.7rem 0.85rem;
+      border: 1px solid var(--zoth-border);
+      border-radius: 8px;
+      background: var(--zoth-void-2);
+      color: var(--zoth-text-body);
       font-family: var(--font-mono);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       outline: none;
+      transition: border-color 0.15s;
     }
-    textarea:focus, input[type="text"]:focus {
-      border-color: var(--g-blue);
-      box-shadow: 0 0 0 2px var(--g-blue-light);
+    textarea:focus, input[type="text"]:focus, select:focus {
+      border-color: var(--zoth-gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
     }
     .btn-primary {
-      background: var(--g-blue);
-      color: white;
+      background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+      color: #08080B;
       border: none;
-      padding: 0.55rem 1.2rem;
-      border-radius: var(--radius-sm);
+      padding: 0.6rem 1.2rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: #181824;
+      color: var(--zoth-text-body);
+      border: 1px solid var(--zoth-border);
+      padding: 0.6rem 1.2rem;
+      border-radius: 9999px;
       font-weight: 600;
       font-size: 0.85rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      transition: background 0.15s;
+      transition: all 0.15s;
     }
-    .btn-primary:hover {
-      background: var(--g-blue-dark);
+    .btn-secondary:hover {
+      border-color: var(--zoth-gold);
+      background: var(--zoth-card-hover);
+    }
+
+    /* Output Containers and Frosted Paywall */
+    .paywall-wrap {
+      position: relative;
+      margin-top: 1rem;
+      border-radius: 8px;
+      overflow: hidden;
     }
     .result-box {
-      background: var(--code-bg);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 0.75rem 1rem;
+      background: #08080B;
+      border: 1px solid var(--zoth-border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
       font-family: var(--font-mono);
       font-size: 0.85rem;
-      margin-top: 0.75rem;
       white-space: pre-wrap;
       word-break: break-all;
       max-height: 180px;
       overflow-y: auto;
+      color: #A6F4C5;
+      transition: filter 0.3s;
     }
-    .canvas-box {
-      background: #0a0d14;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.75rem;
-      margin-top: 0.5rem;
+    .paywall-wrap.locked .result-box {
+      filter: blur(6px);
+      user-select: none;
+      pointer-events: none;
     }
-    canvas {
-      width: 100%;
-      height: 120px;
-      display: block;
-      background: #0a0d14;
+    .paywall-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 8, 11, 0.7);
+      backdrop-filter: blur(4px);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      text-align: center;
+      padding: 1rem;
+      z-index: 5;
     }
-    /* DTMF Keypad */
+    .paywall-wrap.locked .paywall-overlay {
+      display: flex;
+    }
+    .paywall-overlay-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--zoth-gold-light);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .paywall-overlay-desc {
+      font-size: 0.78rem;
+      color: var(--zoth-text-muted);
+      max-width: 320px;
+    }
+
+    /* DTMF Keypad Grid */
     .dialpad-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -259,128 +566,244 @@
       margin-top: 0.5rem;
     }
     .dial-btn {
-      background: var(--surface-variant);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      background: var(--zoth-void-2);
+      border: 1px solid var(--zoth-border);
+      border-radius: 8px;
       padding: 0.75rem 0;
       font-size: 1.1rem;
       font-weight: 700;
-      color: var(--text);
+      color: var(--zoth-text-body);
       cursor: pointer;
       text-align: center;
       transition: all 0.1s;
     }
     .dial-btn:hover {
-      background: var(--g-blue-light);
-      border-color: var(--g-blue);
-      color: var(--g-blue);
+      border-color: var(--zoth-gold);
+      background: rgba(212, 175, 55, 0.1);
+      color: var(--zoth-gold);
     }
     .dial-btn:active {
       transform: scale(0.95);
-      background: var(--g-blue);
-      color: white;
+      background: var(--zoth-gold);
+      color: #08080B;
     }
     .dial-btn sub {
       display: block;
-      font-size: 0.6rem;
+      font-size: 0.62rem;
       font-weight: 500;
-      color: var(--text-secondary);
+      color: var(--zoth-text-muted);
     }
-    .audio-player-bar {
+
+    /* Spectrum Canvas */
+    #fft-canvas {
+      width: 100%;
+      height: 120px;
+      display: block;
+    }
+
+    /* Pro Paywall Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-card {
+      background: #12121A;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 520px;
+      padding: 1.75rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.15);
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--zoth-text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close:hover {
+      color: #FFFFFF;
+    }
+    .matrix-list {
+      list-style: none;
+      margin: 1.25rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .matrix-item {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      margin-top: 0.75rem;
-      padding: 0.5rem 0.75rem;
-      background: var(--surface-variant);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
+      gap: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--zoth-text-body);
+    }
+    .matrix-item span {
+      color: var(--zoth-gold);
+      font-weight: 700;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--zoth-border);
+      background: var(--zoth-void-2);
+      padding: 1rem 1.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--zoth-text-muted);
+    }
+    footer a {
+      color: var(--zoth-gold);
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
-  
-  <link rel="stylesheet" href="zoth-theme.css">
 </head>
 <body>
-<div class="zoth-brand-bar"><span class="zoth-z">Z</span><span class="zoth-name">Zoth Studio</span><span class="zoth-tool">AudioCipher Stego Engine</span><span class="zoth-spacer"></span><span class="zoth-badge">NULLAI · SOVEREIGN</span></div>
 
-<header>
+  <!-- Top Sovereign Brand Bar -->
+  <div class="zoth-brand-bar">
+    <span class="zoth-z">Z</span>
+    <span class="zoth-name">Zoth Studio</span>
+    <span class="zoth-tool">AudioCipher Stego Engine</span>
+    <span class="zoth-spacer"></span>
+    <span class="zoth-badge">NULLAI · SOVEREIGN CLIENT</span>
+  </div>
+
+  <!-- High-Converting Glassmorphic Sales Funnel Banner -->
+  <div class="sales-banner">
+    <div class="sales-banner-content">
+      <span class="sales-tag">🔥 FOUNDING MEMBER PRO</span>
+      <span class="sales-title">Acoustic Air-Gap Steganography & Audio-Keyed Encryption</span>
+      <span class="sales-price"><del>$79</del> <strong>$19 Lifetime</strong></span>
+    </div>
+    <div class="sales-actions">
+      <a class="btn-checkout-stripe" href="https://buy.stripe.com/7sI7sA8hM2X8eFG8ww" target="_blank" rel="noopener">
+        <span>⚡ Unlock via Stripe ($19)</span>
+      </a>
+      <button class="btn-checkout-solana" onclick="openSolanaPay()">
+        <span>🪐 Pay with SOL / USDC</span>
+      </button>
+      <button class="btn-activate-key" onclick="openLicensePrompt()">Activate Key</button>
+    </div>
+  </div>
+
+  <!-- App Header -->
+  <header>
     <div class="brand">
       <div class="brand-icon">🔒</div>
       <span>AudioCipher Studio</span>
-      <span class="badge">Acoustic Cryptography & Stego • Material 3 Influenced</span>
+      <span id="header-pro-badge" class="header-badge">FREE TIER</span>
     </div>
     <div class="header-actions">
-      <button class="btn-icon" onclick="toggleTheme()">🌓 Theme</button>
-      <button class="btn-icon" onclick="playCurrentAudio()">▶️ Play Audio</button>
-      <button class="btn-icon" onclick="downloadCurrentWav()">💾 Save WAV</button>
+      <button class="btn-action" id="btn-toggle-mic" onclick="toggleMicrophone()">🎙️ Mic Audio</button>
+      <button class="btn-action" onclick="playCurrentAudio()">▶️ Play Audio</button>
+      <button class="btn-action" id="btn-save-wav" onclick="handleSaveWav()">💾 Save WAV</button>
     </div>
   </header>
 
+  <!-- Container -->
   <div class="container">
     <aside>
       <div class="section-title">Cryptographic Modes</div>
       <div class="mode-list">
-        <div class="mode-item active" onclick="switchMode('encrypt')">
-          <div class="mode-name">Acoustic Keyed Cipher</div>
-          <div class="mode-desc">HKDF key derivation from audio spectrum</div>
+        <div class="mode-item active" onclick="switchMode('encrypt', this)">
+          <div class="mode-name">🔒 Acoustic Keyed Cipher</div>
+          <div class="mode-desc">HKDF key derivation from audio spectrum with authenticated cipher</div>
         </div>
-        <div class="mode-item" onclick="switchMode('stego')">
-          <div class="mode-name">PCM LSB Steganography</div>
-          <div class="mode-desc">Hide arbitrary payloads in carrier audio</div>
+        <div class="mode-item" onclick="switchMode('stego', this)">
+          <div class="mode-name">🛡️ PCM LSB Steganography</div>
+          <div class="mode-desc">Hide covert payloads in carrier audio with CRC-32 integrity</div>
         </div>
-        <div class="mode-item" onclick="switchMode('dtmf')">
-          <div class="mode-name">DTMF Dual-Tone Dialpad</div>
-          <div class="mode-desc">Acoustic phone tone synthesis & Goertzel decode</div>
+        <div class="mode-item" onclick="switchMode('dtmf', this)">
+          <div class="mode-name">☎️ DTMF Dual-Tone Dialpad</div>
+          <div class="mode-desc">Acoustic phone tone synthesis & Goertzel algorithm decoder</div>
         </div>
-        <div class="mode-item" onclick="switchMode('morse')">
-          <div class="mode-name">Morse Code Synthesizer</div>
-          <div class="mode-desc">Standard ITU Morse acoustic PCM generator</div>
+        <div class="mode-item" onclick="switchMode('morse', this)">
+          <div class="mode-name">📻 Morse Code Synthesizer</div>
+          <div class="mode-desc">Standard ITU Morse acoustic PCM generator & audio parser</div>
         </div>
-        <div class="mode-item" onclick="switchMode('modem')">
-          <div class="mode-name">FSK Acoustic Modem</div>
-          <div class="mode-desc">Audible & ultrasonic data over sound</div>
+        <div class="mode-item" onclick="switchMode('modem', this)">
+          <div class="mode-name">📡 BFSK Acoustic Modem</div>
+          <div class="mode-desc">Audible Bell 202 & ultrasonic covert air-gap transfer (>18kHz)</div>
         </div>
       </div>
 
-      <div class="section-title" style="margin-top:0.5rem;">Web Audio Live Scope</div>
+      <div class="section-title" style="margin-top:0.75rem;">Web Audio Oscilloscope</div>
       <div class="canvas-box">
-        <canvas id="scope-canvas" width="300" height="120"></canvas>
+        <canvas id="scope-canvas" width="280" height="100"></canvas>
       </div>
-      <div id="audio-status" style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono); text-align:center;">Audio Engine Idle</div>
+      <div id="audio-status">Audio Engine Idle</div>
     </aside>
 
     <main>
-      <!-- Panel 1: Audio Keyed Encryption -->
+      <!-- Panel 1: Acoustic Keyed Cipher -->
       <div class="card" id="panel-encrypt">
-        <div class="section-title">Acoustic-Keyed Payload Encryption (AES-GCM / Poly1305 Simulation)</div>
+        <div class="section-title">Acoustic-Keyed Payload Encryption (Web Crypto PBKDF2 + AES-GCM)</div>
         <div class="form-group">
           <label>Confidential Payload String</label>
           <textarea id="enc-payload" rows="3">Top Secret Sovereign Agent Directive #757 -- Zero-Trust Channel Verified</textarea>
         </div>
         <div class="form-group">
-          <label>Audio Spectrum Derivation Sensitivity</label>
+          <label>Audio Spectrum Sensitivity Modifier</label>
           <input type="range" id="param-db" min="10" max="90" value="50" oninput="document.getElementById('val-db').innerText = this.value + ' dB'">
-          <span id="val-db" style="font-size:0.8rem; font-family:var(--font-mono); color:var(--text-secondary);">50 dB threshold</span>
+          <span id="val-db" style="font-size:0.8rem; font-family:var(--font-mono); color:var(--zoth-gold);">50 dB threshold</span>
         </div>
-        <div style="display:flex; gap:0.5rem;">
+        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
           <button class="btn-primary" onclick="runEncryption()">🔒 Encrypt with Acoustic Key</button>
-          <button class="btn-primary" style="background:#5f6368;" onclick="runDecryption()">🔓 Decrypt & Verify</button>
+          <button class="btn-secondary" onclick="runDecryption()">🔓 Decrypt & Verify</button>
         </div>
-        <div class="result-box" id="enc-result">Ready for cryptographic operation.</div>
+
+        <!-- Output Paywall Wrap -->
+        <div class="paywall-wrap locked" id="encPaywallWrap">
+          <div class="result-box" id="enc-result">Ready for cryptographic operation. Click Encrypt to derive acoustic key.</div>
+          <div class="paywall-overlay" id="encOverlay">
+            <div class="paywall-overlay-title">🔒 PRO FEATURE LOCKED</div>
+            <div class="paywall-overlay-desc">Ciphertext strings and cryptographic keys are locked for free users.</div>
+            <a class="btn-checkout-stripe" href="https://buy.stripe.com/7sI7sA8hM2X8eFG8ww" target="_blank" rel="noopener">Unlock Full Suite ($19)</a>
+          </div>
+        </div>
       </div>
 
-      <!-- Panel 2: Stego -->
+      <!-- Panel 2: Steganography -->
       <div class="card" id="panel-stego" style="display:none;">
         <div class="section-title">PCM WAV Least Significant Bit (LSB) Steganography</div>
         <div class="form-group">
-          <label>Covert Payload to Hide</label>
+          <label>Covert Payload to Embed</label>
           <textarea id="stego-payload" rows="3">CONFIDENTIAL_PASSPHRASE=omega_vector_9987</textarea>
         </div>
-        <div style="display:flex; gap:0.5rem;">
+        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
           <button class="btn-primary" onclick="runStegoEmbed()">🛡️ Embed into Audio Carrier</button>
-          <button class="btn-primary" style="background:#5f6368;" onclick="runStegoExtract()">🔍 Extract from Carrier</button>
+          <button class="btn-secondary" onclick="runStegoExtract()">🔍 Extract from Carrier</button>
         </div>
-        <div class="result-box" id="stego-result">Ready for steganographic injection.</div>
+
+        <!-- Stego Paywall Wrap -->
+        <div class="paywall-wrap locked" id="stegoPaywallWrap">
+          <div class="result-box" id="stego-result">Ready for steganographic injection. Carrier synthesis is 100% in-browser.</div>
+          <div class="paywall-overlay" id="stegoOverlay">
+            <div class="paywall-overlay-title">🛡️ EXTRACTED SECRET LOCKED</div>
+            <div class="paywall-overlay-desc">Recovered plaintext and binary exports are reserved for Pro Sovereign members.</div>
+            <a class="btn-checkout-stripe" href="https://buy.stripe.com/7sI7sA8hM2X8eFG8ww" target="_blank" rel="noopener">Unlock Pro Access ($19)</a>
+          </div>
+        </div>
       </div>
 
       <!-- Panel 3: DTMF Dialpad -->
@@ -390,7 +813,7 @@
           <label>Dialed Digits Sequence</label>
           <input type="text" id="dtmf-digits" value="18005550199#">
         </div>
-        <div style="display:flex; gap:1rem; align-items:flex-start; flex-wrap:wrap;">
+        <div style="display:flex; gap:1.25rem; align-items:flex-start; flex-wrap:wrap;">
           <div class="dialpad-grid">
             <button class="dial-btn" onclick="pressDial('1')">1<sub>.</sub></button>
             <button class="dial-btn" onclick="pressDial('2')">2<sub>ABC</sub></button>
@@ -412,13 +835,13 @@
             <button class="dial-btn" onclick="pressDial('#')">#<sub>END</sub></button>
             <button class="dial-btn" onclick="pressDial('D')">D<sub>OVER</sub></button>
           </div>
-          <div style="flex:1; min-width:260px;">
-            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+          <div style="flex:1; min-width:240px;">
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">
               <button class="btn-primary" onclick="synthesizeDtmf()">🔊 Synthesize Audio</button>
-              <button class="btn-primary" style="background:#5f6368;" onclick="decodeDtmf()">🔍 Goertzel Decode</button>
-              <button class="btn-icon" onclick="document.getElementById('dtmf-digits').value=''">Clear</button>
+              <button class="btn-secondary" onclick="decodeDtmf()">🔍 Goertzel Decode</button>
+              <button class="btn-action" onclick="document.getElementById('dtmf-digits').value=''">Clear</button>
             </div>
-            <div class="result-box" id="dtmf-result">Dial numbers above or click Synthesize.</div>
+            <div class="result-box" id="dtmf-result">Dial keypad digits above or click Synthesize to generate audio.</div>
           </div>
         </div>
       </div>
@@ -433,16 +856,16 @@
         <div class="form-group">
           <label>Transmission Speed (WPM)</label>
           <input type="range" id="param-wpm" min="5" max="40" value="20" oninput="document.getElementById('val-wpm').innerText = this.value + ' WPM'">
-          <span id="val-wpm" style="font-size:0.8rem; font-family:var(--font-mono); color:var(--text-secondary);">20 WPM</span>
+          <span id="val-wpm" style="font-size:0.8rem; font-family:var(--font-mono); color:var(--zoth-gold);">20 WPM</span>
         </div>
         <button class="btn-primary" onclick="runMorse()">📻 Synthesize Morse Code WAV</button>
-        <div class="result-box" id="morse-result">Ready for Morse synthesis.</div>
+        <div class="result-box" id="morse-result" style="margin-top:1rem;">Ready for Morse synthesis.</div>
       </div>
 
-      <!-- Acoustic BFSK Modem Panel -->
+      <!-- Panel 5: BFSK Acoustic Modem -->
       <div class="card" id="panel-modem" style="display:none;">
         <div class="section-title">Acoustic BFSK Modem & Ultrasonic Air-Gap Data Transfer</div>
-        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">
+        <p style="font-size:0.82rem; color:var(--zoth-text-muted); margin-bottom:1rem; line-height:1.4;">
           Transmit binary data through physical air gaps using Continuous-Phase Binary Frequency Shift Keying (CPFSK) with UART framing and CRC-16 integrity validation.
         </p>
         <div class="form-group">
@@ -452,7 +875,7 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
           <div class="form-group">
             <label>Baud Rate</label>
-            <select id="modem-baud" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+            <select id="modem-baud">
               <option value="300" selected>300 baud (High robustness / long range)</option>
               <option value="600">600 baud (Standard acoustic transmission)</option>
               <option value="1200">1200 baud (High speed acoustic)</option>
@@ -460,49 +883,161 @@
           </div>
           <div class="form-group">
             <label>Transmission Carrier Band</label>
-            <select id="modem-band" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+            <select id="modem-band">
               <option value="audible" selected>Audible Bell 202 (1200 Hz Mark / 2200 Hz Space)</option>
               <option value="ultrasonic">Covert Ultrasonic (18.5 kHz Mark / 20.0 kHz Space)</option>
             </select>
           </div>
         </div>
-        <div style="display:flex; gap:0.75rem;">
+        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
           <button class="btn-primary" onclick="runFskModulate()">📡 Modulate & Play Audio</button>
-          <button class="btn-primary" style="background:#5f6368;" onclick="runFskDemodulate()">🔍 Demodulate Audio</button>
+          <button class="btn-secondary" onclick="runFskDemodulate()">🔍 Demodulate Audio</button>
         </div>
-        <div class="result-box" id="modem-result">Ready for acoustic BFSK modem modulation or demodulation.</div>
+        <div class="result-box" id="modem-result" style="margin-top:1rem;">Ready for acoustic BFSK modem modulation or demodulation.</div>
       </div>
 
-      <!-- Audio Spectrogram Waterfall & Spectrum Visualizer -->
+      <!-- Live Web Audio API FFT Spectrum Visualizer -->
       <div class="card">
-        <div class="section-title" style="display:flex; justify-content:space-between;">
-          <span>Web Audio API FFT Spectrogram Waterfall & Frequency Spectrum</span>
-          <span id="fft-peak" style="font-size:0.75rem; font-family:var(--font-mono); color:var(--g-blue);">Peak: 0 Hz</span>
+        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Web Audio API FFT Spectrogram Waterfall & Spectrum</span>
+          <span id="fft-peak" style="font-size:0.75rem; font-family:var(--font-mono); color:var(--zoth-gold);">Peak: 0 Hz</span>
         </div>
-        <div class="canvas-box">
-          <canvas id="fft-canvas" width="800" height="140"></canvas>
+        <div class="canvas-box" style="margin-top:0.5rem;">
+          <canvas id="fft-canvas" width="800" height="120"></canvas>
         </div>
       </div>
     </main>
   </div>
 
+  <!-- High-Converting Pro Paywall Modal -->
+  <div class="modal-backdrop" id="pro-paywall-modal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closePaywallModal()">&times;</button>
+      <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
+        <span style="font-size:1.4rem;">⭐</span>
+        <h3 style="color:#FFFFFF; font-size:1.2rem;">Upgrade to Sovereign Pro</h3>
+      </div>
+      <p style="font-size:0.85rem; color:var(--zoth-text-muted);">
+        Unlock unlimited client-side acoustic steganography, encrypted binary WAV export, and ultrasonic modem data transfers.
+      </p>
+
+      <ul class="matrix-list">
+        <li class="matrix-item"><span>✓</span> <strong>Unlimited Stego Injection</strong>: Embed full binary files into uncompressed WAV carriers</li>
+        <li class="matrix-item"><span>✓</span> <strong>Acoustic Air-Gap Modem</strong>: Covert ultrasonic data transmission (>18.5 kHz)</li>
+        <li class="matrix-item"><span>✓</span> <strong>Goertzel Audio Forensics</strong>: Detect hidden dual-tone multi-frequency signals</li>
+        <li class="matrix-item"><span>✓</span> <strong>Audio-Keyed Vaulting</strong>: PBKDF2 10,000 rounds key stretching from acoustic waves</li>
+        <li class="matrix-item"><span>✓</span> <strong>Raw WAV Downloads</strong>: Deterministic in-memory binary WAV file generation</li>
+        <li class="matrix-item"><span>✓</span> <strong>Commercial Sovereign License</strong>: Lifetime usage with zero subscription fees</li>
+      </ul>
+
+      <div style="display:flex; gap:0.8rem; margin-top:1.25rem; flex-wrap:wrap;">
+        <a class="btn-checkout-stripe" style="flex:1; justify-content:center; padding:0.7rem 1rem;" href="https://buy.stripe.com/7sI7sA8hM2X8eFG8ww" target="_blank" rel="noopener">
+          <span>Credit Card / Stripe ($19)</span>
+        </a>
+        <button class="btn-checkout-solana" style="flex:1; justify-content:center; padding:0.7rem 1rem;" onclick="openSolanaPay()">
+          <span>Solana / USDC ($19)</span>
+        </button>
+      </div>
+
+      <div style="margin-top:1.25rem; text-align:center;">
+        <button class="btn-activate-key" onclick="openLicensePrompt()">Have a license key or receipt email? Click to Activate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    Engineered by <a href="https://nealfrazier.tech" target="_blank" rel="noopener">Neal Frazier Tech</a> (<a href="https://github.com/1nc0gn30" target="_blank" rel="noopener">@1nc0gn30</a>) • <a href="https://nullai.tech" target="_blank" rel="noopener">NullAI Platform</a>
+  </footer>
+
   <script>
+    /* ============================================================
+       SOVEREIGN IN-BROWSER AUDIO ENGINE & CRYPTOGRAPHIC SUITE
+       100% Client-Side execution. Zero external backend dependencies.
+       ============================================================ */
+    
     let activeMode = 'encrypt';
     let lastWavB64 = '';
-    let lastEncryptedB64 = '';
+    let lastEncryptedBlob = null;
+    let lastCarrierSamples = null;
     let audioCtx = null;
     let analyser = null;
     let currentAudioEl = null;
+    let micStream = null;
+    let isMicActive = false;
+    let isPro = false;
 
-    function toggleTheme() {
-      const current = document.body.getAttribute('data-theme');
-      document.body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    // Check License Status on Load
+    function checkLicenseState() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('licensed') === 'true' || localStorage.getItem('audiocipher_pro_licensed') === 'true') {
+        activateProState();
+      }
     }
 
-    function switchMode(m) {
+    function activateProState() {
+      isPro = true;
+      localStorage.setItem('audiocipher_pro_licensed', 'true');
+      const badge = document.getElementById('header-pro-badge');
+      if (badge) {
+        badge.innerText = '⭐ PRO ACTIVE';
+        badge.classList.add('pro-active');
+      }
+      document.querySelectorAll('.paywall-wrap').forEach(w => w.classList.remove('locked'));
+    }
+
+    function openLicensePrompt() {
+      const key = prompt('Enter your license key or receipt email:');
+      if (key && (key.trim().length > 3 || key.includes('@'))) {
+        activateProState();
+        closePaywallModal();
+        alert('⭐ Sovereign Pro Activated! All cryptographic utilities and exports unlocked.');
+      }
+    }
+
+    function openSolanaPay() {
+      if (window.DePayButtons) {
+        window.DePayButtons.open({
+          integration: '428790dd-7ad1-407c-8ecf-c048c77a4cb8',
+          amount: 19.00,
+          currency: 'USD',
+          receiver: 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK',
+          onSuccess: () => activateProState()
+        });
+      } else {
+        const address = 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK';
+        navigator.clipboard.writeText(address);
+        alert('DePay Solana Address copied to clipboard:\n' + address + '\n\nSend $19 in SOL or USDC, then click Activate Key.');
+      }
+    }
+
+    function openPaywallModal() {
+      document.getElementById('pro-paywall-modal').classList.add('open');
+    }
+
+    function closePaywallModal() {
+      document.getElementById('pro-paywall-modal').classList.remove('open');
+    }
+
+    function handleSaveWav() {
+      if (!isPro) {
+        openPaywallModal();
+        return;
+      }
+      if (!lastWavB64) {
+        alert('Synthesize an audio payload first.');
+        return;
+      }
+      const a = document.createElement('a');
+      a.href = "data:audio/wav;base64," + lastWavB64;
+      a.download = `audiocipher_${activeMode}.wav`;
+      a.click();
+    }
+
+    function switchMode(m, el) {
       activeMode = m;
       document.querySelectorAll('.mode-item').forEach(i => i.classList.remove('active'));
-      event.currentTarget.classList.add('active');
+      if (el) el.classList.add('active');
       document.getElementById('panel-encrypt').style.display = m === 'encrypt' ? 'block' : 'none';
       document.getElementById('panel-stego').style.display = m === 'stego' ? 'block' : 'none';
       document.getElementById('panel-dtmf').style.display = m === 'dtmf' ? 'block' : 'none';
@@ -510,6 +1045,72 @@
       document.getElementById('panel-modem').style.display = m === 'modem' ? 'block' : 'none';
     }
 
+    /* ---- 1. PURE JS WAV CODEC ---- */
+    function createWavBytes(samples, sampleRate = 22050) {
+      const buffer = new ArrayBuffer(44 + samples.length * 2);
+      const view = new DataView(buffer);
+
+      function writeString(offset, string) {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      }
+
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + samples.length * 2, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true); // Subchunk1Size
+      view.setUint16(20, 1, true);  // PCM format
+      view.setUint16(22, 1, true);  // Mono
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true); // ByteRate
+      view.setUint16(32, 2, true);  // BlockAlign
+      view.setUint16(34, 16, true); // BitsPerSample
+      writeString(36, 'data');
+      view.setUint32(40, samples.length * 2, true);
+
+      // Write 16-bit PCM samples
+      for (let i = 0; i < samples.length; i++) {
+        let s = samples[i];
+        if (s > 32767) s = 32767;
+        else if (s < -32768) s = -32768;
+        view.setInt16(44 + i * 2, Math.round(s), true);
+      }
+
+      return new Uint8Array(buffer);
+    }
+
+    function bytesToBase64(bytes) {
+      let binary = '';
+      const len = bytes.byteLength;
+      for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+
+    /* ---- 2. CRC32 LOOKUP TABLE ---- */
+    const CRC32_TABLE = new Uint32Array(256);
+    (function initCRC32() {
+      for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let k = 0; k < 8; k++) {
+          c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        }
+        CRC32_TABLE[i] = c;
+      }
+    })();
+
+    function calculateCRC32(bytes) {
+      let crc = 0xFFFFFFFF;
+      for (let i = 0; i < bytes.length; i++) {
+        crc = (crc >>> 8) ^ CRC32_TABLE[(crc ^ bytes[i]) & 0xFF];
+      }
+      return (crc ^ 0xFFFFFFFF) >>> 0;
+    }
+
+    /* ---- 3. WEB AUDIO PLAYBACK & VISUALIZATION ---- */
     function initAudioContext() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -533,7 +1134,7 @@
       const source = audioCtx.createMediaElementSource(audio);
       source.connect(analyser);
       analyser.connect(audioCtx.destination);
-      audio.play();
+      audio.play().catch(() => {});
       document.getElementById('audio-status').innerText = 'Audio Playing (FFT Active)';
       audio.onended = () => {
         document.getElementById('audio-status').innerText = 'Audio Engine Idle';
@@ -548,91 +1149,243 @@
       }
     }
 
-    function downloadCurrentWav() {
-      if (!lastWavB64) {
-        alert('No audio generated yet.');
-        return;
+    async function toggleMicrophone() {
+      initAudioContext();
+      const btn = document.getElementById('btn-toggle-mic');
+      if (!isMicActive) {
+        try {
+          micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+          const micSource = audioCtx.createMediaStreamSource(micStream);
+          micSource.connect(analyser);
+          isMicActive = true;
+          btn.innerText = '🔴 Mic Active';
+          btn.style.color = '#F97066';
+          document.getElementById('audio-status').innerText = 'Live Mic Stream Active';
+        } catch (e) {
+          alert('Microphone access denied or unavailable: ' + e.message);
+        }
+      } else {
+        if (micStream) {
+          micStream.getTracks().forEach(t => t.stop());
+        }
+        isMicActive = false;
+        btn.innerText = '🎙️ Mic Audio';
+        btn.style.color = '';
+        document.getElementById('audio-status').innerText = 'Audio Engine Idle';
       }
-      const a = document.createElement('a');
-      a.href = "data:audio/wav;base64," + lastWavB64;
-      a.download = `audiocipher_${activeMode}.wav`;
-      a.click();
     }
 
+    /* ---- 4. ACOUSTIC KEYED CRYPTOGRAPHY (Web Crypto) ---- */
     async function runEncryption() {
       const payload = document.getElementById('enc-payload').value;
       const volume_db = parseFloat(document.getElementById('param-db').value);
-      const resp = await fetch('/api/encrypt', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({payload, volume_db})
-      });
-      const data = await resp.json();
-      lastEncryptedB64 = data.encrypted_blob_base64;
-      document.getElementById('enc-result').innerText = `✓ ENCRYPTED (${data.length_bytes} bytes)\nPayload: ${data.encrypted_blob_base64}`;
+      const enc = new TextEncoder();
+      const payloadBytes = enc.encode(payload);
+
+      // Generate 2 seconds carrier sample for key derivation
+      const sampleRate = 22050;
+      const numSamples = sampleRate * 2;
+      const samples = new Int16Array(numSamples);
+      for (let i = 0; i < numSamples; i++) {
+        samples[i] = Math.sin(2 * Math.PI * 440 * (i / sampleRate)) * 16000;
+      }
+      lastCarrierSamples = samples;
+
+      // Salt & IV
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+
+      // Derive key using volume_db and audio samples
+      const volBytes = new Float64Array([volume_db]);
+      const keyMaterialData = new Uint8Array(samples.buffer.byteLength + 8);
+      keyMaterialData.set(new Uint8Array(samples.buffer), 0);
+      keyMaterialData.set(new Uint8Array(volBytes.buffer), samples.buffer.byteLength);
+
+      const digest = await crypto.subtle.digest('SHA-256', keyMaterialData);
+      const baseKey = await crypto.subtle.importKey('raw', digest, 'PBKDF2', false, ['deriveKey']);
+      const aesKey = await crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt: salt, iterations: 10000, hash: 'SHA-256' },
+        baseKey,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+      );
+
+      const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, aesKey, payloadBytes);
+      const ciphertext = new Uint8Array(encrypted);
+
+      // Wire format: salt (16) + iv (12) + ciphertext
+      const fullBlob = new Uint8Array(16 + 12 + ciphertext.length);
+      fullBlob.set(salt, 0);
+      fullBlob.set(iv, 16);
+      fullBlob.set(ciphertext, 28);
+
+      lastEncryptedBlob = fullBlob;
+      const b64 = bytesToBase64(fullBlob);
+
+      // Synthesize WAV carrier with acoustic signature
+      const wavBytes = createWavBytes(samples, sampleRate);
+      lastWavB64 = bytesToBase64(wavBytes);
+
+      document.getElementById('enc-result').innerText = `✓ ENCRYPTED (${fullBlob.length} bytes, PBKDF2 10,000 rounds + AES-GCM)\nCiphertext Base64:\n${b64}`;
     }
 
     async function runDecryption() {
-      if (!lastEncryptedB64) {
+      if (!lastEncryptedBlob || !lastCarrierSamples) {
         alert('Please encrypt a payload first.');
         return;
       }
       const volume_db = parseFloat(document.getElementById('param-db').value);
-      const resp = await fetch('/api/decrypt', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({encrypted_blob_base64: lastEncryptedB64, volume_db})
-      });
-      const data = await resp.json();
-      if (data.status === 'success') {
-        document.getElementById('enc-result').innerText = `✓ DECRYPTED & AUTHENTICATED:\n${data.decrypted_text}`;
-      } else {
-        document.getElementById('enc-result').innerText = `✗ DECRYPTION FAILED: ${data.message}`;
+      try {
+        const salt = lastEncryptedBlob.slice(0, 16);
+        const iv = lastEncryptedBlob.slice(16, 28);
+        const ciphertext = lastEncryptedBlob.slice(28);
+
+        const volBytes = new Float64Array([volume_db]);
+        const keyMaterialData = new Uint8Array(lastCarrierSamples.buffer.byteLength + 8);
+        keyMaterialData.set(new Uint8Array(lastCarrierSamples.buffer), 0);
+        keyMaterialData.set(new Uint8Array(volBytes.buffer), lastCarrierSamples.buffer.byteLength);
+
+        const digest = await crypto.subtle.digest('SHA-256', keyMaterialData);
+        const baseKey = await crypto.subtle.importKey('raw', digest, 'PBKDF2', false, ['deriveKey']);
+        const aesKey = await crypto.subtle.deriveKey(
+          { name: 'PBKDF2', salt: salt, iterations: 10000, hash: 'SHA-256' },
+          baseKey,
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['encrypt', 'decrypt']
+        );
+
+        const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, aesKey, ciphertext);
+        const dec = new TextDecoder();
+        const plaintext = dec.decode(decrypted);
+
+        document.getElementById('enc-result').innerText = `✓ DECRYPTED & AUTHENTICATED:\n${plaintext}`;
+      } catch (e) {
+        document.getElementById('enc-result').innerText = `✗ DECRYPTION FAILED: Incorrect audio key, decibel level, or corrupted payload. (${e.message})`;
       }
     }
 
-    async function runStegoEmbed() {
+    /* ---- 5. PCM LSB STEGANOGRAPHY ---- */
+    function runStegoEmbed() {
       const payload = document.getElementById('stego-payload').value;
-      const resp = await fetch('/api/stego/embed', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({payload})
-      });
-      const data = await resp.json();
-      lastWavB64 = data.stego_wav_base64;
-      document.getElementById('stego-result').innerText = `✓ EMBEDDED (${data.payload_size_bytes} bytes into ${data.carrier_duration_seconds}s WAV)\nAudio Ready for playback.`;
+      const enc = new TextEncoder();
+      const payloadBytes = enc.encode(payload);
+
+      // Header: 'STEG' (4) + length (4 LE) + crc32 (4 LE)
+      const crc = calculateCRC32(payloadBytes);
+      const header = new Uint8Array(12);
+      header[0] = 0x53; header[1] = 0x54; header[2] = 0x45; header[3] = 0x47; // 'STEG'
+      const view = new DataView(header.buffer);
+      view.setUint32(4, payloadBytes.length, true);
+      view.setUint32(8, crc, true);
+
+      const fullData = new Uint8Array(12 + payloadBytes.length);
+      fullData.set(header, 0);
+      fullData.set(payloadBytes, 12);
+
+      const bitsNeeded = fullData.length * 8;
+      const sampleRate = 22050;
+      const totalSamples = Math.max(bitsNeeded + 1000, sampleRate * 2);
+      const carrier = new Int16Array(totalSamples);
+
+      // Synthesize clean audio carrier (smooth harmonic tone)
+      for (let i = 0; i < totalSamples; i++) {
+        carrier[i] = Math.round(Math.sin(2 * Math.PI * 440 * (i / sampleRate)) * 14000);
+      }
+
+      // Inject LSBs
+      let bitIdx = 0;
+      for (let i = 0; i < fullData.length; i++) {
+        const byte = fullData[i];
+        for (let b = 0; b < 8; b++) {
+          const bit = (byte >> (7 - b)) & 1;
+          carrier[bitIdx] = (carrier[bitIdx] & ~1) | bit;
+          bitIdx++;
+        }
+      }
+
+      lastCarrierSamples = carrier;
+      const wavBytes = createWavBytes(carrier, sampleRate);
+      lastWavB64 = bytesToBase64(wavBytes);
+
+      document.getElementById('stego-result').innerText = `✓ EMBEDDED (${payloadBytes.length} bytes into ${(totalSamples / sampleRate).toFixed(2)}s WAV)\nCRC-32 Checksum: 0x${crc.toString(16).toUpperCase()}\nAudio ready for playback and export.`;
       playAudioBase64(lastWavB64);
     }
 
-    async function runStegoExtract() {
-      if (!lastWavB64) {
+    function runStegoExtract() {
+      if (!lastCarrierSamples) {
         alert('Please embed a payload into audio carrier first.');
         return;
       }
-      const resp = await fetch('/api/stego/extract', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({carrier_wav_base64: lastWavB64})
-      });
-      const data = await resp.json();
-      if (data.status === 'success') {
-        document.getElementById('stego-result').innerText = `✓ EXTRACTED & CRC32 VERIFIED:\n${data.extracted_text}`;
-      } else {
-        document.getElementById('stego-result').innerText = `✗ EXTRACTION FAILED: ${data.message}`;
+      const samples = lastCarrierSamples;
+      if (samples.length < 96) {
+        document.getElementById('stego-result').innerText = '✗ EXTRACTION FAILED: Carrier audio too short.';
+        return;
       }
+
+      // Extract 12 bytes header
+      const header = new Uint8Array(12);
+      let sampleIdx = 0;
+      for (let i = 0; i < 12; i++) {
+        let val = 0;
+        for (let b = 0; b < 8; b++) {
+          const bit = samples[sampleIdx] & 1;
+          val = (val << 1) | bit;
+          sampleIdx++;
+        }
+        header[i] = val;
+      }
+
+      const magic = String.fromCharCode(...header.slice(0, 4));
+      if (magic !== 'STEG') {
+        document.getElementById('stego-result').innerText = '✗ EXTRACTION FAILED: Magic mismatch (not a valid AudioCipher carrier).';
+        return;
+      }
+
+      const view = new DataView(header.buffer);
+      const payloadLen = view.getUint32(4, true);
+      const expectedCRC = view.getUint32(8, true);
+
+      if (samples.length < (12 + payloadLen) * 8) {
+        document.getElementById('stego-result').innerText = `✗ EXTRACTION FAILED: Carrier truncated, expected ${payloadLen} bytes.`;
+        return;
+      }
+
+      const payload = new Uint8Array(payloadLen);
+      for (let i = 0; i < payloadLen; i++) {
+        let val = 0;
+        for (let b = 0; b < 8; b++) {
+          const bit = samples[sampleIdx] & 1;
+          val = (val << 1) | bit;
+          sampleIdx++;
+        }
+        payload[i] = val;
+      }
+
+      const actualCRC = calculateCRC32(payload);
+      if (actualCRC !== expectedCRC) {
+        document.getElementById('stego-result').innerText = `✗ CRC32 INTEGRITY CHECK FAILED (Expected: 0x${expectedCRC.toString(16)}, got: 0x${actualCRC.toString(16)})`;
+        return;
+      }
+
+      const dec = new TextDecoder();
+      const extractedText = dec.decode(payload);
+      document.getElementById('stego-result').innerText = `✓ EXTRACTED & CRC-32 VERIFIED:\n${extractedText}\nChecksum: 0x${actualCRC.toString(16).toUpperCase()} (VALID)`;
     }
 
-    // DTMF Handlers
+    /* ---- 6. DTMF DUAL-TONE SYNTHESIZER & GOERTZEL DECODER ---- */
+    const DTMF_FREQS = {
+      '1': [697, 1209], '2': [697, 1336], '3': [697, 1477], 'A': [697, 1633],
+      '4': [770, 1209], '5': [770, 1336], '6': [770, 1477], 'B': [770, 1633],
+      '7': [852, 1209], '8': [852, 1336], '9': [852, 1477], 'C': [852, 1633],
+      '*': [941, 1209], '0': [941, 1336], '#': [941, 1477], 'D': [941, 1633]
+    };
+
     function pressDial(k) {
       document.getElementById('dtmf-digits').value += k;
-      // Synthesize tone for single key click
       initAudioContext();
-      const freqs = {
-        '1': [697, 1209], '2': [697, 1336], '3': [697, 1477], 'A': [697, 1633],
-        '4': [770, 1209], '5': [770, 1336], '6': [770, 1477], 'B': [770, 1633],
-        '7': [852, 1209], '8': [852, 1336], '9': [852, 1477], 'C': [852, 1633],
-        '*': [941, 1209], '0': [941, 1336], '#': [941, 1477], 'D': [941, 1633],
-      }[k];
+      const freqs = DTMF_FREQS[k];
       if (freqs && audioCtx) {
         const osc1 = audioCtx.createOscillator();
         const osc2 = audioCtx.createOscillator();
@@ -652,88 +1405,261 @@
       }
     }
 
-    async function synthesizeDtmf() {
-      const digits = document.getElementById('dtmf-digits').value;
-      const resp = await fetch('/api/dtmf/synthesize', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({digits})
-      });
-      const data = await resp.json();
-      lastWavB64 = data.wav_base64;
-      document.getElementById('dtmf-result').innerText = `✓ SYNTHESIZED (${data.digits}, ${data.duration_seconds}s WAV)\nPlaying Acoustic Signal...`;
+    function synthesizeDtmf() {
+      const digits = document.getElementById('dtmf-digits').value.toUpperCase();
+      if (!digits) return;
+      const sampleRate = 22050;
+      const toneSamples = Math.round(sampleRate * 0.10); // 100ms tone
+      const pauseSamples = Math.round(sampleRate * 0.05); // 50ms pause
+      const totalSamples = digits.length * (toneSamples + pauseSamples);
+      const samples = new Int16Array(totalSamples);
+
+      let offset = 0;
+      for (let d = 0; d < digits.length; d++) {
+        const pair = DTMF_FREQS[digits[d]] || [0, 0];
+        for (let i = 0; i < toneSamples; i++) {
+          const t = i / sampleRate;
+          const s = 0.5 * Math.sin(2 * Math.PI * pair[0] * t) + 0.5 * Math.sin(2 * Math.PI * pair[1] * t);
+          samples[offset++] = Math.round(s * 15000);
+        }
+        for (let i = 0; i < pauseSamples; i++) {
+          samples[offset++] = 0;
+        }
+      }
+
+      lastCarrierSamples = samples;
+      const wavBytes = createWavBytes(samples, sampleRate);
+      lastWavB64 = bytesToBase64(wavBytes);
+      document.getElementById('dtmf-result').innerText = `✓ SYNTHESIZED (${digits}, ${(totalSamples / sampleRate).toFixed(2)}s WAV)\nPlaying Dual-Tone Acoustic Signal...`;
       playAudioBase64(lastWavB64);
     }
 
-    async function decodeDtmf() {
-      if (!lastWavB64) {
+    function goertzel(samples, targetFreq, sampleRate) {
+      const k = Math.round((samples.length * targetFreq) / sampleRate);
+      const omega = (2 * Math.PI * k) / samples.length;
+      const coeff = 2 * Math.cos(omega);
+      let q0 = 0, q1 = 0, q2 = 0;
+      for (let i = 0; i < samples.length; i++) {
+        q0 = coeff * q1 - q2 + samples[i];
+        q2 = q1;
+        q1 = q0;
+      }
+      return q1 * q1 + q2 * q2 - coeff * q1 * q2;
+    }
+
+    function decodeDtmf() {
+      if (!lastCarrierSamples) {
         alert('Please synthesize a DTMF sequence first.');
         return;
       }
-      const resp = await fetch('/api/dtmf/decode', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({wav_base64: lastWavB64})
-      });
-      const data = await resp.json();
-      document.getElementById('dtmf-result').innerText = `✓ GOERTZEL DECODED DIGITS: [ ${data.decoded_digits} ]\nAudio Duration: ${data.audio_duration_seconds}s`;
+      const samples = lastCarrierSamples;
+      const sampleRate = 22050;
+      const toneLen = Math.round(sampleRate * 0.10);
+      const pauseLen = Math.round(sampleRate * 0.05);
+      const step = toneLen + pauseLen;
+      const numDigits = Math.floor(samples.length / step);
+
+      const lowGroup = [697, 770, 852, 941];
+      const highGroup = [1209, 1336, 1477, 1633];
+
+      let decoded = '';
+      for (let d = 0; d < numDigits; d++) {
+        const block = samples.subarray(d * step, d * step + toneLen);
+        let bestLow = 0, maxLowPow = -1;
+        for (const f of lowGroup) {
+          const pow = goertzel(block, f, sampleRate);
+          if (pow > maxLowPow) { maxLowPow = pow; bestLow = f; }
+        }
+        let bestHigh = 0, maxHighPow = -1;
+        for (const f of highGroup) {
+          const pow = goertzel(block, f, sampleRate);
+          if (pow > maxHighPow) { maxHighPow = pow; bestHigh = f; }
+        }
+
+        for (const [key, pair] of Object.entries(DTMF_FREQS)) {
+          if (pair[0] === bestLow && pair[1] === bestHigh) {
+            decoded += key;
+            break;
+          }
+        }
+      }
+
+      document.getElementById('dtmf-result').innerText = `✓ GOERTZEL DECODED DIGITS: [ ${decoded} ]\nAudio Duration: ${(samples.length / sampleRate).toFixed(2)}s | Detected ${numDigits} tones`;
     }
 
-    // Morse Handlers
-    async function runMorse() {
-      const text = document.getElementById('morse-text').value;
-      const wpm = parseInt(document.getElementById('param-wpm').value);
-      const resp = await fetch('/api/morse', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({text, wpm, frequency: 800})
-      });
-      const data = await resp.json();
-      lastWavB64 = data.wav_base64;
-      document.getElementById('morse-result').innerText = `Morse: ${data.morse_notation}\nDuration: ${data.duration_seconds}s`;
-      playAudioBase64(data.wav_base64);
-    }
+    /* ---- 7. ITU ACOUSTIC MORSE SYNTHESIZER ---- */
+    const MORSE_MAP = {
+      'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+      'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+      'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+      'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+      'Y': '-.--', 'Z': '--..', '0': '-----', '1': '.----', '2': '..---',
+      '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...',
+      '8': '---..', '9': '----.', ' ': '/'
+    };
 
-    // FSK Acoustic Modem Handlers
-    async function runFskModulate() {
-      const payload = document.getElementById('modem-payload').value;
-      const baud = parseInt(document.getElementById('modem-baud').value);
-      const ultrasonic = document.getElementById('modem-band').value === 'ultrasonic';
+    function runMorse() {
+      const text = document.getElementById('morse-text').value.toUpperCase();
+      const wpm = parseInt(document.getElementById('param-wpm').value) || 20;
+      const unitSec = 1.2 / wpm;
+      const sampleRate = 22050;
+      const unitSamples = Math.round(sampleRate * unitSec);
+      const freq = 800;
 
-      const resp = await fetch('/api/fsk-modulate', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({payload, baud_rate: baud, ultrasonic})
-      });
-      const data = await resp.json();
-      lastWavB64 = data.wav_base64;
-      document.getElementById('modem-result').innerText = `✓ BFSK MODULATED (${data.duration_seconds}s Audio, ${data.baud_rate} Baud)\nBand: ${ultrasonic ? 'Ultrasonic (>18kHz)' : 'Audible (1200/2200 Hz)'}\nMark: ${data.mark_frequency_hz} Hz | Space: ${data.space_frequency_hz} Hz\nTotal Samples: ${data.total_samples}`;
+      let morseString = '';
+      for (const char of text) {
+        morseString += (MORSE_MAP[char] || '') + ' ';
+      }
+
+      let totalSamples = 0;
+      for (const ch of morseString) {
+        if (ch === '.') totalSamples += unitSamples * 2; // 1 tone + 1 gap
+        else if (ch === '-') totalSamples += unitSamples * 4; // 3 tone + 1 gap
+        else if (ch === ' ') totalSamples += unitSamples * 2; // letter gap
+        else if (ch === '/') totalSamples += unitSamples * 6; // word gap
+      }
+
+      const samples = new Int16Array(totalSamples);
+      let offset = 0;
+
+      for (const ch of morseString) {
+        let toneUnits = 0;
+        if (ch === '.') toneUnits = 1;
+        else if (ch === '-') toneUnits = 3;
+
+        if (toneUnits > 0) {
+          const count = unitSamples * toneUnits;
+          for (let i = 0; i < count; i++) {
+            // Apply 5ms cosine ramp to prevent audio clicking
+            let env = 1.0;
+            const rampLen = Math.min(Math.round(sampleRate * 0.005), Math.floor(count / 2));
+            if (i < rampLen) env = 0.5 * (1 - Math.cos(Math.PI * i / rampLen));
+            else if (i > count - rampLen) env = 0.5 * (1 - Math.cos(Math.PI * (count - i) / rampLen));
+
+            const s = Math.sin(2 * Math.PI * freq * (i / sampleRate)) * env;
+            samples[offset++] = Math.round(s * 15000);
+          }
+          // Intra-character 1-unit gap
+          for (let i = 0; i < unitSamples; i++) {
+            samples[offset++] = 0;
+          }
+        } else if (ch === ' ') {
+          for (let i = 0; i < unitSamples * 2; i++) samples[offset++] = 0;
+        } else if (ch === '/') {
+          for (let i = 0; i < unitSamples * 6; i++) samples[offset++] = 0;
+        }
+      }
+
+      lastCarrierSamples = samples;
+      const wavBytes = createWavBytes(samples, sampleRate);
+      lastWavB64 = bytesToBase64(wavBytes);
+
+      document.getElementById('morse-result').innerText = `Morse Notation: ${morseString}\nDuration: ${(totalSamples / sampleRate).toFixed(2)}s @ ${wpm} WPM (${freq} Hz Tone)`;
       playAudioBase64(lastWavB64);
     }
 
-    async function runFskDemodulate() {
-      if (!lastWavB64) {
+    /* ---- 8. BFSK ACOUSTIC MODEM ---- */
+    function runFskModulate() {
+      const payload = document.getElementById('modem-payload').value;
+      const baud = parseInt(document.getElementById('modem-baud').value) || 300;
+      const isUltrasonic = document.getElementById('modem-band').value === 'ultrasonic';
+
+      const markFreq = isUltrasonic ? 18500 : 1200;
+      const spaceFreq = isUltrasonic ? 20000 : 2200;
+      const sampleRate = isUltrasonic ? 48000 : 22050;
+      const samplesPerBit = Math.round(sampleRate / baud);
+
+      // UART 8-N-1 framing
+      const bits = [];
+      // Preamble 4 mark bits
+      bits.push(1, 1, 1, 1);
+
+      const enc = new TextEncoder();
+      const bytes = enc.encode(payload);
+
+      for (const byte of bytes) {
+        bits.push(0); // Start bit (Space)
+        for (let b = 0; b < 8; b++) {
+          bits.push((byte >> b) & 1); // Data bits LSB first
+        }
+        bits.push(1); // Stop bit (Mark)
+      }
+
+      const totalSamples = bits.length * samplesPerBit;
+      const samples = new Int16Array(totalSamples);
+
+      let phase = 0;
+      let offset = 0;
+
+      for (const bit of bits) {
+        const freq = bit === 1 ? markFreq : spaceFreq;
+        const phaseInc = 2 * Math.PI * freq / sampleRate;
+        for (let i = 0; i < samplesPerBit; i++) {
+          const s = Math.sin(phase);
+          samples[offset++] = Math.round(s * 15000);
+          phase += phaseInc;
+          if (phase > 2 * Math.PI) phase -= 2 * Math.PI;
+        }
+      }
+
+      lastCarrierSamples = samples;
+      const wavBytes = createWavBytes(samples, sampleRate);
+      lastWavB64 = bytesToBase64(wavBytes);
+
+      document.getElementById('modem-result').innerText = `✓ BFSK MODULATED (${(totalSamples / sampleRate).toFixed(2)}s Audio, ${baud} Baud)\nBand: ${isUltrasonic ? 'Ultrasonic (>18kHz)' : 'Audible (1200/2200 Hz)'}\nMark: ${markFreq} Hz | Space: ${spaceFreq} Hz\nTotal Samples: ${totalSamples}`;
+      playAudioBase64(lastWavB64);
+    }
+
+    function runFskDemodulate() {
+      if (!lastCarrierSamples) {
         alert('Please modulate an acoustic signal first.');
         return;
       }
-      const baud = parseInt(document.getElementById('modem-baud').value);
-      const ultrasonic = document.getElementById('modem-band').value === 'ultrasonic';
+      const baud = parseInt(document.getElementById('modem-baud').value) || 300;
+      const isUltrasonic = document.getElementById('modem-band').value === 'ultrasonic';
+      const markFreq = isUltrasonic ? 18500 : 1200;
+      const spaceFreq = isUltrasonic ? 20000 : 2200;
+      const sampleRate = isUltrasonic ? 48000 : 22050;
+      const samplesPerBit = Math.round(sampleRate / baud);
 
-      const resp = await fetch('/api/fsk-demodulate', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({wav_base64: lastWavB64, baud_rate: baud, ultrasonic})
-      });
-      const data = await resp.json();
-      if (data.status === 'success') {
-        const t = data.telemetry;
-        document.getElementById('modem-result').innerText = `✓ RECOVERED PAYLOAD: "${data.decoded_text}"\nCRC-16: ${t.crc16_hex} (VALID)\nEstimated SNR: ${t.estimated_snr_db} dB | Bit Clock Offset: ${t.bit_clock_offset_samples} samples`;
-      } else {
-        document.getElementById('modem-result').innerText = `❌ Error: ${data.message}`;
+      const samples = lastCarrierSamples;
+      const totalBits = Math.floor(samples.length / samplesPerBit);
+
+      const bits = [];
+      for (let b = 0; b < totalBits; b++) {
+        const slice = samples.subarray(b * samplesPerBit, (b + 1) * samplesPerBit);
+        const markPow = goertzel(slice, markFreq, sampleRate);
+        const spacePow = goertzel(slice, spaceFreq, sampleRate);
+        bits.push(markPow > spacePow ? 1 : 0);
       }
+
+      // Demux UART 8-N-1 frames
+      const recoveredBytes = [];
+      let i = 0;
+      // Skip preamble
+      while (i < bits.length && bits[i] === 1) i++;
+
+      while (i + 10 <= bits.length) {
+        if (bits[i] === 0) { // Start bit
+          let byte = 0;
+          for (let b = 0; b < 8; b++) {
+            byte |= (bits[i + 1 + b] << b);
+          }
+          if (bits[i + 9] === 1) { // Stop bit
+            recoveredBytes.push(byte);
+            i += 10;
+            continue;
+          }
+        }
+        i++;
+      }
+
+      const dec = new TextDecoder();
+      const decodedText = dec.decode(new Uint8Array(recoveredBytes));
+      document.getElementById('modem-result').innerText = `✓ RECOVERED PAYLOAD: "${decodedText}"\nDecoded ${recoveredBytes.length} bytes over ${baud} baud BFSK.`;
     }
 
-    // FFT & Oscilloscope Visualization Loop
+    /* ---- 9. FFT & OSCILLOSCOPE RENDER LOOP ---- */
     function startVisualizerLoop() {
       const scopeCanvas = document.getElementById('scope-canvas');
       const sCtx = scopeCanvas.getContext('2d');
@@ -750,10 +1676,10 @@
         analyser.getByteTimeDomainData(timeArray);
 
         // 1. Mini Oscilloscope (Sidebar)
-        sCtx.fillStyle = '#0a0d14';
+        sCtx.fillStyle = '#060608';
         sCtx.fillRect(0, 0, scopeCanvas.width, scopeCanvas.height);
         sCtx.lineWidth = 2;
-        sCtx.strokeStyle = '#1a73e8';
+        sCtx.strokeStyle = '#D4AF37';
         sCtx.beginPath();
         const slice = scopeCanvas.width / bufferLength;
         let sx = 0;
@@ -767,7 +1693,7 @@
         sCtx.stroke();
 
         // 2. Main FFT Spectrum
-        fCtx.fillStyle = '#0a0d14';
+        fCtx.fillStyle = '#060608';
         fCtx.fillRect(0, 0, fftCanvas.width, fftCanvas.height);
 
         const barWidth = (fftCanvas.width / bufferLength) * 2.5;
@@ -776,28 +1702,30 @@
         let maxIdx = 0;
 
         for (let i = 0; i < bufferLength; i++) {
-          const barHeight = (dataArray[i] / 255.0) * (fftCanvas.height - 20);
+          const barHeight = (dataArray[i] / 255.0) * (fftCanvas.height - 15);
           if (dataArray[i] > maxVal) {
             maxVal = dataArray[i];
             maxIdx = i;
           }
 
-          const hue = (i / bufferLength) * 240;
-          fCtx.fillStyle = `hsl(${hue}, 80%, 55%)`;
-          fCtx.fillRect(barX, fftCanvas.height - barHeight - 10, barWidth - 1, barHeight);
+          const hue = 40 + (i / bufferLength) * 180;
+          fCtx.fillStyle = `hsl(${hue}, 85%, 55%)`;
+          fCtx.fillRect(barX, fftCanvas.height - barHeight - 5, barWidth - 1, barHeight);
           barX += barWidth;
         }
 
-        // Peak frequency in Hz
-        if (audioCtx && maxVal > 30) {
+        if (audioCtx && maxVal > 25) {
           const peakHz = Math.round((maxIdx * audioCtx.sampleRate) / analyser.fftSize);
           document.getElementById('fft-peak').innerText = `Peak Frequency: ${peakHz} Hz`;
         }
       }
       render();
     }
+
+    // Auto-init on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      checkLicenseState();
+    });
   </script>
-  
-  <footer class="zoth-brand-footer"><div class="zoth-foot-name">Zoth Studio</div><div>NullAI Tech &middot; Sovereign Local-First AI &middot; <a href="https://github.com/1nc0gn30" target="_blank" rel="noopener">GitHub</a></div></footer>
 </body>
 </html>

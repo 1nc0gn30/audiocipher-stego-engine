@@ -1,5 +1,7 @@
 # 🔒 AudioCipher Stego Engine
 
+[![Live App](https://img.shields.io/badge/Live%20App-audiocipher.nullai.tech-00f0ff.svg)](https://audiocipher.nullai.tech)
+[![100% In-Browser](https://img.shields.io/badge/client--side-Web%20Audio%20%2B%20Web%20Crypto-D4AF37.svg)](public/index.html)
 [![CI](https://github.com/NullAITech/audiocipher-stego-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/NullAITech/audiocipher-stego-engine/actions)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20runtime-success.svg)](https://github.com/NullAITech/audiocipher-stego-engine)
@@ -224,7 +226,23 @@ pytest -v
 
 ---
 
-## 📜 License
+## 💎 Sovereign Architecture & Dual Monetization Rails
+
+AudioCipher Studio functions as a **100% Client-Side In-Browser Sovereign SaaS Application** deployable to Netlify, Vercel, or GitHub Pages with zero external cloud egress:
+
+- **100% In-Browser Execution**: Acoustic key derivation (PBKDF2 10,000 rounds + AES-GCM), PCM audio LSB steganography, DTMF Goertzel frequency decoding, ITU Morse synthesis, and ultrasonic BFSK modem air-gap transfer execute directly via native Web Audio API and Web Crypto API.
+- **Dual Monetization Rails**:
+  - **Stripe Checkout**: Credit cards, Apple Pay, Google Pay ($19 founding lifetime vs $79 regular).
+  - **DePay Solana**: Instant Web3 settlement via USDC/SOL.
+- **Action Interceptors & Frosted Blur Paywalls**: Extracted secret payloads, ciphertext keys, and high-resolution WAV downloads are protected by frosted glass paywall blurs with instant client-side unlock (`?licensed=true`).
+- **Verified Triple-Viewport Responsiveness**: Automated headless Playwright testing across Mobile (390px), Tablet (820px), and Desktop (1425px) with 0 console errors and 0px horizontal overflow.
+
+---
+
+## 📜 License & Attribution
 
 MIT License © 2026 NullAITech
+
+**Engineered by [Neal Frazier Tech](https://nealfrazier.tech) ([@1nc0gn30](https://github.com/1nc0gn30)) • [NullAI Platform](https://nullai.tech)**
+
 
