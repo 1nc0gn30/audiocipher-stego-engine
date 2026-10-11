@@ -675,6 +675,58 @@
     footer a:hover {
       text-decoration: underline;
     }
+
+    /* Sovereign Toast Notification Engine */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      z-index: 99999;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      background: rgba(18, 18, 26, 0.95);
+      border: 1px solid var(--zoth-border);
+      border-left: 4px solid var(--zoth-gold);
+      color: var(--zoth-text-body);
+      padding: 0.75rem 1.25rem;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      animation: toastIn 0.25s ease-out;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      max-width: 380px;
+    }
+
+    .toast.toast-success {
+      border-left-color: var(--accent-green);
+    }
+
+    .toast.toast-error {
+      border-left-color: var(--accent-red);
+    }
+
+    .toast.toast-info {
+      border-left-color: var(--zoth-gold);
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body>
@@ -685,14 +737,14 @@
     <span class="zoth-name">Zoth Studio</span>
     <span class="zoth-tool">AudioCipher Stego Engine</span>
     <span class="zoth-spacer"></span>
-    <span class="zoth-badge">NULLAI · SOVEREIGN CLIENT</span>
+    <span class="zoth-badge version-badge">v2.5 SOVEREIGN</span>
   </div>
 
   <!-- High-Converting Glassmorphic Sales Funnel Banner -->
-  <div class="sales-banner">
+  <div class="sales-banner" id="salesBanner">
     <div class="sales-banner-content">
       <span class="sales-tag">🔥 FOUNDING MEMBER PRO</span>
-      <span class="sales-title">Acoustic Air-Gap Steganography & Audio-Keyed Encryption</span>
+      <span class="sales-title">Acoustic Air-Gap Steganography &amp; Audio-Keyed Encryption</span>
       <span class="sales-price"><del>$79</del> <strong>$19 Lifetime</strong></span>
     </div>
     <div class="sales-actions">
@@ -711,7 +763,7 @@
     <div class="brand">
       <div class="brand-icon">🔒</div>
       <span>AudioCipher Studio</span>
-      <span id="header-pro-badge" class="header-badge">FREE TIER</span>
+      <span id="licenseBadge" class="header-badge" data-alias="header-pro-badge">⚡ FREE TIER</span>
     </div>
     <div class="header-actions">
       <button class="btn-action" id="btn-toggle-mic" onclick="toggleMicrophone()">🎙️ Mic Audio</button>
@@ -910,7 +962,7 @@
   </div>
 
   <!-- High-Converting Pro Paywall Modal -->
-  <div class="modal-backdrop" id="pro-paywall-modal">
+  <div class="modal-backdrop" id="pro-paywall-modal" data-alias="paywall-modal">
     <div class="modal-card">
       <button class="modal-close" onclick="closePaywallModal()">&times;</button>
       <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
@@ -939,8 +991,15 @@
         </button>
       </div>
 
-      <div style="margin-top:1.25rem; text-align:center;">
-        <button class="btn-activate-key" onclick="openLicensePrompt()">Have a license key or receipt email? Click to Activate</button>
+      <div style="border-top: 1px solid var(--zoth-border); padding-top: 1rem; margin-top: 1.25rem;">
+        <label for="license-key-input" style="display:block; font-size:0.78rem; color:var(--zoth-text-muted); margin-bottom:0.4rem;">
+          Already purchased? Enter receipt email or license key:
+        </label>
+        <div style="display:flex; gap:0.5rem;">
+          <input type="text" id="license-key-input" style="flex:1; background:rgba(0,0,0,0.5); border:1px solid var(--zoth-border); border-radius:6px; padding:0.5rem 0.8rem; color:#FFFFFF; font-family:var(--font-mono); font-size:0.85rem;" placeholder="e.g. user@domain.com or AUDIOCIPHER-PRO-2026">
+          <button id="activate-key-btn" class="btn-activate-key" style="margin:0; padding:0.5rem 1rem;" onclick="handleActivateInput()">Activate</button>
+        </div>
+        <div id="license-status" style="font-size:0.8rem; margin-top:0.4rem; min-height:1rem;"></div>
       </div>
     </div>
   </div>
@@ -949,6 +1008,8 @@
   <footer>
     Engineered by <a href="https://nealfrazier.tech" target="_blank" rel="noopener">Neal Frazier Tech</a> (<a href="https://github.com/1nc0gn30" target="_blank" rel="noopener">@1nc0gn30</a>) • <a href="https://nullai.tech" target="_blank" rel="noopener">NullAI Platform</a>
   </footer>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <script>
     /* ============================================================
@@ -967,32 +1028,113 @@
     let isMicActive = false;
     let isPro = false;
 
+    // Sovereign Toast Notification Engine
+    function showToast(message, type = 'info') {
+      let container = document.getElementById('toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+      }
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
     // Check License Status on Load
     function checkLicenseState() {
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('licensed') === 'true' || localStorage.getItem('audiocipher_pro_licensed') === 'true') {
-        activateProState();
+      if (urlParams.get('licensed') === 'true') {
+        localStorage.setItem('audiocipher_pro_licensed', 'true');
+        localStorage.setItem('pro_licensed', 'true');
+        localStorage.setItem('agent_audiocipher_pro', 'true');
+        localStorage.setItem('zoth_audiocipher_licensed', 'true');
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+        setTimeout(() => showToast('⭐ Pro License Activated via Checkout!', 'success'), 250);
+      }
+
+      const isLicensed = localStorage.getItem('audiocipher_pro_licensed') === 'true' ||
+                         localStorage.getItem('audiocipher_license') !== null ||
+                         localStorage.getItem('agent_audiocipher_pro') === 'true' ||
+                         localStorage.getItem('zoth_audiocipher_licensed') === 'true' ||
+                         localStorage.getItem('pro_licensed') === 'true';
+
+      const banner = document.getElementById('salesBanner');
+      if (banner) {
+        banner.style.display = isLicensed ? 'none' : 'flex';
+      }
+
+      const badge = document.getElementById('licenseBadge') || document.getElementById('header-pro-badge');
+      if (isLicensed) {
+        isPro = true;
+        if (badge) {
+          badge.innerText = '⭐ PRO ACTIVE';
+          badge.classList.add('pro-active');
+        }
+        document.querySelectorAll('.paywall-wrap').forEach(w => {
+          w.classList.remove('locked');
+          w.classList.remove('paywall-blur');
+        });
+      } else {
+        isPro = false;
+        if (badge) {
+          badge.innerText = '⚡ FREE TIER';
+          badge.classList.remove('pro-active');
+        }
+        document.querySelectorAll('.paywall-wrap').forEach(w => {
+          w.classList.add('locked');
+          w.classList.add('paywall-blur');
+        });
       }
     }
 
     function activateProState() {
       isPro = true;
       localStorage.setItem('audiocipher_pro_licensed', 'true');
-      const badge = document.getElementById('header-pro-badge');
-      if (badge) {
-        badge.innerText = '⭐ PRO ACTIVE';
-        badge.classList.add('pro-active');
+      localStorage.setItem('audiocipher_license', 'AUDIOCIPHER-PRO-2026');
+      localStorage.setItem('agent_audiocipher_pro', 'true');
+      localStorage.setItem('zoth_audiocipher_licensed', 'true');
+      localStorage.setItem('pro_licensed', 'true');
+      checkLicenseState();
+      showToast('⭐ Sovereign Pro Activated! All cryptographic utilities unlocked.', 'success');
+    }
+
+    function handleActivateInput() {
+      const input = document.getElementById('license-key-input');
+      const status = document.getElementById('license-status');
+      const val = input ? input.value.trim() : '';
+      const valid = val.length >= 6 || val.toUpperCase().includes('PRO') || val.includes('@');
+      if (valid) {
+        localStorage.setItem('audiocipher_license', val);
+        activateProState();
+        if (status) {
+          status.textContent = '✅ License successfully activated!';
+          status.style.color = '#12B76A';
+        }
+        setTimeout(() => {
+          closePaywallModal();
+        }, 600);
+      } else {
+        if (status) {
+          status.textContent = '❌ Please enter a valid license key or receipt email.';
+          status.style.color = '#F97066';
+        }
+        showToast('Please enter a valid license key or receipt email.', 'error');
       }
-      document.querySelectorAll('.paywall-wrap').forEach(w => w.classList.remove('locked'));
     }
 
     function openLicensePrompt() {
-      const key = prompt('Enter your license key or receipt email:');
-      if (key && (key.trim().length > 3 || key.includes('@'))) {
-        activateProState();
-        closePaywallModal();
-        alert('⭐ Sovereign Pro Activated! All cryptographic utilities and exports unlocked.');
-      }
+      openPaywallModal();
+      const input = document.getElementById('license-key-input');
+      if (input) input.focus();
     }
 
     function openSolanaPay() {
@@ -1007,7 +1149,7 @@
       } else {
         const address = 'GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK';
         navigator.clipboard.writeText(address);
-        alert('DePay Solana Address copied to clipboard:\n' + address + '\n\nSend $19 in SOL or USDC, then click Activate Key.');
+        showToast('DePay Solana Address copied to clipboard. Send $19 in SOL or USDC, then click Activate Key.', 'info');
       }
     }
 
@@ -1025,7 +1167,7 @@
         return;
       }
       if (!lastWavB64) {
-        alert('Synthesize an audio payload first.');
+        showToast('Synthesize an audio payload first.', 'error');
         return;
       }
       const a = document.createElement('a');
@@ -1145,7 +1287,7 @@
       if (lastWavB64) {
         playAudioBase64(lastWavB64);
       } else {
-        alert('Synthesize an audio payload first.');
+        showToast('Synthesize an audio payload first.', 'error');
       }
     }
 
@@ -1162,7 +1304,7 @@
           btn.style.color = '#F97066';
           document.getElementById('audio-status').innerText = 'Live Mic Stream Active';
         } catch (e) {
-          alert('Microphone access denied or unavailable: ' + e.message);
+          showToast('Microphone access denied or unavailable: ' + e.message, 'error');
         }
       } else {
         if (micStream) {
@@ -1232,7 +1374,7 @@
 
     async function runDecryption() {
       if (!lastEncryptedBlob || !lastCarrierSamples) {
-        alert('Please encrypt a payload first.');
+        showToast('Please encrypt a payload first.', 'error');
         return;
       }
       const volume_db = parseFloat(document.getElementById('param-db').value);
@@ -1315,7 +1457,7 @@
 
     function runStegoExtract() {
       if (!lastCarrierSamples) {
-        alert('Please embed a payload into audio carrier first.');
+        showToast('Please embed a payload into audio carrier first.', 'error');
         return;
       }
       const samples = lastCarrierSamples;
@@ -1449,7 +1591,7 @@
 
     function decodeDtmf() {
       if (!lastCarrierSamples) {
-        alert('Please synthesize a DTMF sequence first.');
+        showToast('Please synthesize a DTMF sequence first.', 'error');
         return;
       }
       const samples = lastCarrierSamples;
@@ -1612,7 +1754,7 @@
 
     function runFskDemodulate() {
       if (!lastCarrierSamples) {
-        alert('Please modulate an acoustic signal first.');
+        showToast('Please modulate an acoustic signal first.', 'error');
         return;
       }
       const baud = parseInt(document.getElementById('modem-baud').value) || 300;
