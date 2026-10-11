@@ -117,6 +117,17 @@ EMBEDDED_STUDIO_HTML = """<!DOCTYPE html>
 </html>"""
 
 
+def _safe_rel(raw: str) -> str:
+    """Request path -> safe relative path inside a static dir; '' (index) if it
+    tries to climb out with '..' or is absolute. Raw request paths are not normalised."""
+    from urllib.parse import unquote
+    rel = unquote(str(raw or "")).replace("\\", "/").lstrip("/")
+    parts = [p for p in rel.split("/") if p not in ("", ".")]
+    if any(p == ".." for p in parts) or ":" in (parts[0] if parts else ""):
+        return ""
+    return "/".join(parts)
+
+
 def _is_local_origin(origin) -> bool:
     """True for no Origin (CLI/curl/same-origin GET) or a localhost origin."""
     if not origin:
@@ -181,7 +192,7 @@ class AudioCipherHTTPHandler(BaseHTTPRequestHandler):
 
         # Serve UI & Static Assets from public/
         public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "public"))
-        rel_path = path.lstrip("/")
+        rel_path = _safe_rel(path)
         if not rel_path or rel_path in ("index.html", "studio"):
             rel_path = "index.html"
         target_file = os.path.abspath(os.path.join(public_dir, rel_path))
