@@ -1,3 +1,9 @@
+<div align="center">
+  <img src="assets/hero-banner.svg" alt="Audiocipher Stego Engine — Sovereign Architecture Banner" width="100%" />
+</div>
+
+<br />
+
 # 🔒 AudioCipher Stego Engine
 
 [![Live App](https://img.shields.io/badge/Live%20App-audiocipher.nullai.tech-00f0ff.svg)](https://audiocipher.nullai.tech)
