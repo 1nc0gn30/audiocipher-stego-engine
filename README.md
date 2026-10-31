@@ -232,16 +232,16 @@ pytest -v
 
 ---
 
-## 💎 Sovereign Architecture & Dual Monetization Rails
+## 💎 100% Free & Open Access (Zero Paywalls)
 
-AudioCipher Studio functions as a **100% Client-Side In-Browser Sovereign SaaS Application** deployable to Netlify, Vercel, or GitHub Pages with zero external cloud egress:
+AudioCipher Studio functions as a **100% Client-Side In-Browser Sovereign Application** deployable to Netlify, Vercel, or GitHub Pages with zero external cloud egress:
 
-- **100% In-Browser Execution**: Acoustic key derivation (PBKDF2 10,000 rounds + AES-GCM), PCM audio LSB steganography, DTMF Goertzel frequency decoding, ITU Morse synthesis, and ultrasonic BFSK modem air-gap transfer execute directly via native Web Audio API and Web Crypto API.
-- **Dual Monetization Rails**:
-  - **Stripe Checkout**: Credit cards, Apple Pay, Google Pay ($19 founding lifetime vs $79 regular).
-  - **DePay Solana**: Instant Web3 settlement via USDC/SOL.
-- **Action Interceptors & Frosted Blur Paywalls**: Extracted secret payloads, ciphertext keys, and high-resolution WAV downloads are protected by frosted glass paywall blurs with instant client-side unlock (`?licensed=true`).
-- **Verified Triple-Viewport Responsiveness**: Automated headless Playwright testing across Mobile (390px), Tablet (820px), and Desktop (1425px) with 0 console errors and 0px horizontal overflow.
+- **100% In-Browser Execution**: Acoustic key derivation (PBKDF2 10,000 rounds + AES-GCM), PCM audio LSB steganography, DTMF Goertzel frequency decoding, ITU Morse synthesis, and ultrasonic BFSK modem air-gap transfer execute directly via native Web Audio API and Web Crypto API. Zero server communication or audio telemetry occurs.
+- **Zero Paywalls & Zero Blur Locks**: All features, LSB steganography embeddings, raw binary WAV downloads, DTMF decodes, and ultrasonic transmissions are 100% unlocked and free by default.
+- **Optional Community Support Architecture**:
+  - **☕ Buy Us a Coffee (Stripe)**: [https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X](https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X)
+  - **◎ Solana Wallet Tip Address**: `GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK` (`solana:GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK`)
+- **Verified Triple-Viewport Responsiveness**: Automated headless browser testing across Mobile (375px), Tablet (768px), and Desktop (1280px+) with 0 console errors and 0px horizontal overflow.
 
 ---
 

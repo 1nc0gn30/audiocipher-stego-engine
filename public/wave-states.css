@@ -1,0 +1,262 @@
+/* ============================================================
+   AudioCipher Studio — Precision Interaction & Acoustic States
+   :focus-visible, hover, empty and error presentation
+   Prefers-reduced-motion accessibility coverage
+   ============================================================ */
+
+/* 1. Visible Focus States (:focus-visible) */
+button:focus-visible,
+a:focus-visible,
+.mode-item:focus-visible,
+.dial-btn:focus-visible,
+.modal-close:focus-visible {
+  outline: 2px solid var(--zoth-gold);
+  outline-offset: 2px;
+}
+
+.btn-checkout-solana:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+textarea:focus-visible,
+input[type="text"]:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: var(--zoth-gold);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.35);
+}
+
+input[type="range"]:focus-visible {
+  outline: 2px solid var(--zoth-gold);
+  outline-offset: 4px;
+}
+
+.btn-activate-key:focus-visible,
+#activate-key-btn:focus-visible {
+  outline: 2px solid var(--zoth-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 2. Tactile Hover & Active States */
+.btn-primary {
+  transition: background 0.15s ease, transform 0.12s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.985);
+  box-shadow: 0 2px 6px rgba(212, 175, 55, 0.25);
+}
+
+.btn-secondary {
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-secondary:hover {
+  border-color: var(--zoth-gold);
+  background: var(--zoth-card-hover);
+  color: var(--zoth-text-body);
+}
+
+.btn-secondary:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.btn-action {
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-action:hover {
+  background: var(--zoth-card-hover);
+  border-color: var(--zoth-gold);
+  color: var(--zoth-gold-light);
+}
+
+.btn-action:active {
+  transform: scale(0.98);
+}
+
+.btn-checkout-stripe {
+  transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.btn-checkout-stripe:hover {
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.45);
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.btn-checkout-stripe:active {
+  transform: translateY(0) scale(0.985);
+  filter: brightness(0.98);
+}
+
+.btn-checkout-solana {
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-checkout-solana:hover {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.12);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-checkout-solana:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.btn-activate-key {
+  transition: color 0.15s ease;
+}
+
+.btn-activate-key:hover {
+  color: var(--zoth-gold-light);
+  text-decoration: underline;
+}
+
+.btn-activate-key:active {
+  color: var(--zoth-gold-dark);
+}
+
+.dial-btn {
+  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease, transform 0.08s ease;
+}
+
+.dial-btn:hover {
+  border-color: var(--zoth-gold);
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--zoth-gold-light);
+}
+
+.dial-btn:active {
+  transform: scale(0.94);
+  background: var(--zoth-gold);
+  color: #08080B;
+}
+
+.mode-item {
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+}
+
+.mode-item:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+  background: var(--zoth-card-hover);
+}
+
+.mode-item:active {
+  transform: scale(0.995);
+}
+
+.modal-close {
+  transition: color 0.15s ease, transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-close:hover {
+  color: #FFFFFF;
+  transform: scale(1.1);
+}
+
+.modal-close:active {
+  transform: scale(0.95);
+}
+
+input[type="range"] {
+  cursor: pointer;
+}
+
+textarea:hover,
+input[type="text"]:hover,
+select:hover {
+  border-color: var(--zoth-border-light);
+}
+
+footer a {
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+footer a:hover {
+  color: var(--zoth-gold-light);
+  text-decoration: underline;
+}
+
+/* 3. Empty Presentation (:empty) */
+#license-status:empty {
+  display: none;
+}
+
+#toast-container:empty {
+  display: none;
+}
+
+.result-box:empty {
+  opacity: 0.6;
+}
+
+/* 4. Error & Feedback Presentation */
+textarea:invalid,
+input[type="text"]:invalid {
+  border-color: var(--accent-red);
+}
+
+#license-status {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  transition: opacity 0.15s ease;
+}
+
+.toast.toast-error {
+  border-left: 4px solid var(--accent-red);
+  background: rgba(26, 12, 14, 0.96);
+  border-color: rgba(249, 112, 102, 0.35);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7), 0 0 16px rgba(249, 112, 102, 0.18);
+}
+
+.toast.toast-success {
+  border-left: 4px solid var(--accent-green);
+  background: rgba(10, 24, 16, 0.96);
+  border-color: rgba(18, 183, 106, 0.35);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7), 0 0 16px rgba(18, 183, 106, 0.18);
+}
+
+.toast.toast-info {
+  border-left: 4px solid var(--zoth-gold);
+  background: rgba(20, 18, 12, 0.96);
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7), 0 0 16px rgba(212, 175, 55, 0.18);
+}
+
+/* 5. Prefers-Reduced-Motion Accessibility Coverage */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .btn-checkout-stripe,
+  .btn-checkout-solana,
+  .btn-primary,
+  .btn-secondary,
+  .btn-action,
+  .dial-btn,
+  .modal-close,
+  .mode-item {
+    transform: none !important;
+  }
+
+  .toast {
+    animation: none !important;
+    transform: none !important;
+  }
+}
