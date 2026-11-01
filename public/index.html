@@ -38,8 +38,8 @@
         },
         "creator": {
           "@type": "Person",
-          "name": "Neal Frazier",
-          "url": "https://nealfrazier.tech"
+          "name": "1nc0gn30",
+          "url": "https://nullai.tech"
         }
       },
       {
@@ -977,7 +977,7 @@
 
   <!-- Footer -->
   <footer>
-    Engineered by <a href="https://nealfrazier.tech" target="_blank" rel="noopener">Neal Frazier Tech</a> (<a href="https://github.com/1nc0gn30/audiocipher-stego-engine" target="_blank" rel="noopener">@1nc0gn30</a>) • <a href="https://nullai.tech" target="_blank" rel="noopener">NullAI Platform</a>
+    Engineered by <a href="https://nullai.tech" target="_blank" rel="noopener">1nc0gn30 • NullAI</a> (<a href="https://github.com/1nc0gn30/audiocipher-stego-engine" target="_blank" rel="noopener">@1nc0gn30</a>) • <a href="https://nullai.tech" target="_blank" rel="noopener">NullAI Platform</a>
   </footer>
 
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
@@ -1074,7 +1074,68 @@
         view.setInt16(44 + i * 2, Math.round(s), true);
       }
 
+      renderSamplesToCanvases(samples, sampleRate);
       return new Uint8Array(buffer);
+    }
+
+    function renderSamplesToCanvases(samples, sampleRate = 22050) {
+      try {
+        const scopeCanvas = document.getElementById('scope-canvas');
+        const fftCanvas = document.getElementById('fft-canvas');
+        if (scopeCanvas && samples && samples.length > 0) {
+          const sCtx = scopeCanvas.getContext('2d');
+          const sw = scopeCanvas.width, sh = scopeCanvas.height;
+          sCtx.fillStyle = '#060608';
+          sCtx.fillRect(0, 0, sw, sh);
+          sCtx.strokeStyle = 'rgba(212,175,55,0.15)';
+          sCtx.lineWidth = 1;
+          sCtx.beginPath();
+          sCtx.moveTo(0, sh / 2);
+          sCtx.lineTo(sw, sh / 2);
+          sCtx.stroke();
+
+          sCtx.lineWidth = 2;
+          sCtx.strokeStyle = '#00f0ff';
+          sCtx.beginPath();
+          const viewLen = Math.min(samples.length, 600);
+          for (let x = 0; x < sw; x++) {
+            const idx = Math.floor((x / sw) * viewLen);
+            const norm = samples[idx] / 32768;
+            const y = (sh / 2) - norm * (sh * 0.42);
+            if (x === 0) sCtx.moveTo(x, y);
+            else sCtx.lineTo(x, y);
+          }
+          sCtx.stroke();
+        }
+        if (fftCanvas && samples && samples.length > 0) {
+          const fCtx = fftCanvas.getContext('2d');
+          const fw = fftCanvas.width, fh = fftCanvas.height;
+          fCtx.fillStyle = '#060608';
+          fCtx.fillRect(0, 0, fw, fh);
+          const numBins = 64;
+          const barW = (fw / numBins);
+          const slice = samples.subarray(0, Math.min(samples.length, 2048));
+          let maxPow = 0, bestFreq = 440;
+          const powers = [];
+          for (let b = 0; b < numBins; b++) {
+            const freq = 100 + (b / numBins) * (sampleRate > 30000 ? 21000 : 4000);
+            const p = Math.sqrt(Math.max(0, goertzel(slice, freq, sampleRate))) / slice.length;
+            powers.push({ freq, p });
+            if (p > maxPow) { maxPow = p; bestFreq = Math.round(freq); }
+          }
+          for (let b = 0; b < numBins; b++) {
+            const norm = maxPow > 0 ? Math.min(1, powers[b].p / maxPow) : 0.1;
+            const bh = Math.max(4, norm * (fh - 16));
+            const hue = 40 + (b / numBins) * 160;
+            fCtx.fillStyle = `hsl(${hue}, 85%, 55%)`;
+            fCtx.fillRect(b * barW + 1, fh - bh - 4, barW - 2, bh);
+          }
+          const peakEl = document.getElementById('fft-peak');
+          if (peakEl) peakEl.innerText = `Peak Frequency: ${bestFreq} Hz (${sampleRate} Hz PCM)`;
+          const stEl = document.getElementById('audio-status');
+          if (stEl) stEl.innerText = `PCM Buffer Ready (${(samples.length / sampleRate).toFixed(2)}s @ ${sampleRate}Hz)`;
+        }
+      } catch (e) {}
     }
 
     function bytesToBase64(bytes) {
@@ -1671,6 +1732,16 @@
         analyser.getByteFrequencyData(dataArray);
         analyser.getByteTimeDomainData(timeArray);
 
+        let maxVal = 0;
+        let maxIdx = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          if (dataArray[i] > maxVal) {
+            maxVal = dataArray[i];
+            maxIdx = i;
+          }
+        }
+        if (maxVal < 15) return; // Keep PCM buffer waveform & Goertzel spectrum visible when WebAudio output sink is silent
+
         // 1. Mini Oscilloscope (Sidebar)
         sCtx.fillStyle = '#060608';
         sCtx.fillRect(0, 0, scopeCanvas.width, scopeCanvas.height);
@@ -1694,16 +1765,9 @@
 
         const barWidth = (fftCanvas.width / bufferLength) * 2.5;
         let barX = 0;
-        let maxVal = 0;
-        let maxIdx = 0;
 
         for (let i = 0; i < bufferLength; i++) {
           const barHeight = (dataArray[i] / 255.0) * (fftCanvas.height - 15);
-          if (dataArray[i] > maxVal) {
-            maxVal = dataArray[i];
-            maxIdx = i;
-          }
-
           const hue = 40 + (i / bufferLength) * 180;
           fCtx.fillStyle = `hsl(${hue}, 85%, 55%)`;
           fCtx.fillRect(barX, fftCanvas.height - barHeight - 5, barWidth - 1, barHeight);
@@ -1720,8 +1784,14 @@
 
     // Auto-init on page load
     window.addEventListener('DOMContentLoaded', () => {
-      // 100% Unlocked Sovereign Suite
+      // Synthesize initial 440Hz preview so oscilloscope & FFT canvases are live immediately
+      const preview = new Int16Array(2048);
+      for (let i = 0; i < 2048; i++) {
+        preview[i] = Math.round(Math.sin(2 * Math.PI * 440 * (i / 22050)) * 14000 + Math.sin(2 * Math.PI * 880 * (i / 22050)) * 4000);
+      }
+      renderSamplesToCanvases(preview, 22050);
     });
   </script>
+  <script src="/assets/sovereign-upgrade.js" defer></script>
 </body>
 </html>

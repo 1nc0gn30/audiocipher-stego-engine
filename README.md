@@ -249,6 +249,6 @@ AudioCipher Studio functions as a **100% Client-Side In-Browser Sovereign Applic
 
 MIT License © 2026 NullAITech
 
-**Engineered by [Neal Frazier Tech](https://nealfrazier.tech) ([@1nc0gn30](https://github.com/1nc0gn30)) • [NullAI Platform](https://nullai.tech)**
+**Engineered by [1nc0gn30 • NullAI](https://nullai.tech) ([@1nc0gn30](https://github.com/1nc0gn30)) • [NullAI Platform](https://nullai.tech)**
 
 

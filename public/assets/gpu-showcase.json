@@ -1,0 +1,41 @@
+{
+  "repo_id": "audiocipher-stego-engine",
+  "title": "Audiocipher Stego Engine",
+  "engineered_by": "1nc0gn30 (@1nc0gn30) \u2022 NullAI Platform",
+  "gpu_engine": "NVIDIA A100 80GB PCIe (ComfyUI FLUX.1 + Qwen2.5-Coder-32B + Trimesh GLB)",
+  "archetype": "lissajous",
+  "accent_hex": "#A855F7",
+  "qwen32b_design_spec": "Audiocipher Stego Engine: Lissajous waveforms, #A855F7 accents, seamless audio visualization, dynamic phase shifts, real-time encryption feedback.",
+  "assets": {
+    "hero_4k": "/assets/gpu-hero-4k.png",
+    "og_banner": "/og-banner.jpg",
+    "model_3d_glb": "/assets/gpu-artifact.glb",
+    "showreel_webm": "/assets/gpu-showreel.webm",
+    "ad_mp4": "/assets/gpu-ad-15s.mp4"
+  },
+  "benchmark_ms": {
+    "index": 19,
+    "total_repos": 99,
+    "repo_id": "audiocipher-stego-engine",
+    "title": "Audiocipher Stego Engine",
+    "archetype": "lissajous",
+    "accent_hex": "#A855F7",
+    "glb_ms": 1160,
+    "flux_hero_ms": 8428,
+    "flux_og_ms": 6374,
+    "video_ms": 1431,
+    "qwen32b_ms": 4327,
+    "total_ms": 21722,
+    "glb_kb": 126.9,
+    "hero_kb": 371.1,
+    "og_kb": 473.6,
+    "qwen32b_spec": "Audiocipher Stego Engine: Lissajous waveforms, #A855F7 accents, seamless audio visualization, dynamic phase shifts, real-time encryption feedback.",
+    "hero_gallery_url": "/gallery/audiocipher-stego-engine_gpu-hero-4k.png",
+    "og_gallery_url": "/gallery/audiocipher-stego-engine_og-banner.jpg",
+    "glb_gallery_url": "/gallery/audiocipher-stego-engine.glb",
+    "vram_used_mb": 55829,
+    "vram_total_mb": 81152,
+    "timestamp": "03:25:54 UTC"
+  },
+  "timestamp": "2026-11-01T03:25:54Z"
+}
