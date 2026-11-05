@@ -1792,6 +1792,22 @@
       renderSamplesToCanvases(preview, 22050);
     });
   </script>
-  <script src="/assets/sovereign-upgrade.js" defer></script>
+  
+
+  <script src="/sovereign_tutorial.js"></script>
+  <script>
+    window.addEventListener("DOMContentLoaded", function() {
+      if (window.createSovereignTutorial) {
+        window.createSovereignTutorial({
+          toolId: "audiocipher-stego-engine",
+          toolName: "AudioCipher Stego Studio",
+          tagline: "Hide secret encrypted text and files inside ordinary audio waveforms!",
+          accentColor: "#C084FC",
+          steps: [{"icon": "\ud83c\udfb5", "title": "What is Steganography?", "desc": "Steganography is the science of hiding invisible secret messages inside music or sound files so nobody knows they exist!"}, {"icon": "\ud83d\udd10", "title": "AES-256 LSB Encoding", "desc": "Encrypts your text and embeds the binary bits into the least-significant bits of a WAV or MP3 audio file."}, {"icon": "\ud83c\udfa7", "title": "Undetectable to Human Ears", "desc": "The audio sounds 100% identical when played, but decoding with your secret password extracts your hidden payload."}]
+        });
+      }
+    });
+  </script>
+
 </body>
 </html>
