@@ -6,7 +6,7 @@ Zero external runtime dependencies (100% Python Standard Library).
 from __future__ import annotations
 
 import math
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from audiocipher_stego_engine.wav_codec import AudioBuffer
 

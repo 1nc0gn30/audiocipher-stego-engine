@@ -8,7 +8,7 @@ from __future__ import annotations
 import math
 import struct
 import zlib
-from typing import Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from audiocipher_stego_engine.wav_codec import AudioBuffer
 
