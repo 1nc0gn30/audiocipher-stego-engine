@@ -27,7 +27,7 @@ from audiocipher_stego_engine.stego_engine import StegoEngine
 from audiocipher_stego_engine.wav_codec import AudioBuffer
 
 SERVER_NAME = "audiocipher-stego-engine"
-SERVER_VERSION = "0.1.0"
+SERVER_VERSION = "2.5.0"
 PROTOCOL_VERSION = "2024-11-05"
 
 

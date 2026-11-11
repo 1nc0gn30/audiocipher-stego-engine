@@ -30,7 +30,7 @@ from audiocipher_stego_engine.steganalysis import (
 from audiocipher_stego_engine.stego_engine import StegoEngine
 from audiocipher_stego_engine.wav_codec import AudioBuffer
 
-__version__ = "0.1.0"
+__version__ = "2.5.0"
 __author__ = "1nc0gn30"
 
 __all__ = [

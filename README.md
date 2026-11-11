@@ -1,278 +1,163 @@
 <div align="center">
-  <img src="assets/hero-banner.svg" alt="Audiocipher Stego Engine — Sovereign Architecture Banner" width="100%" />
+  <img src="assets/hero-banner.svg" alt="AudioCipher Stego Studio Banner" width="100%" />
 </div>
 
-<br />
+# AudioCipher Stego Studio (`audiocipher-stego-engine`)
 
-# 🔒 AudioCipher Stego Engine
+Audio-keyed encryption, 16-bit PCM WAV LSB/parity steganography, statistical steganalysis, ITU Morse & DTMF synthesis/decoding, and BFSK acoustic modem toolkit with zero external Python runtime dependencies.
 
-[![Live App](https://img.shields.io/badge/Live%20App-audiocipher.nullai.tech-00f0ff.svg)](https://audiocipher.nullai.tech)
-[![100% In-Browser](https://img.shields.io/badge/client--side-Web%20Audio%20%2B%20Web%20Crypto-D4AF37.svg)](public/index.html)
-[![CI](https://github.com/NullAITech/audiocipher-stego-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/NullAITech/audiocipher-stego-engine/actions)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20runtime-success.svg)](https://github.com/NullAITech/audiocipher-stego-engine)
-[![MCP Server](https://img.shields.io/badge/MCP-FastMCP%202024--11--05-blueviolet.svg)](https://modelcontextprotocol.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-> **Audio-Keyed Authenticated Cryptography, PCM Audio Steganography & Morse Spectrogram Synthesizer with Material 3 Web UI, Multi-OS CLI, FastMCP stdio server, and zero external runtime dependencies.**
+- **Repositories**: `https://github.com/1nc0gn30/audiocipher-stego-engine` • `https://github.com/NullAITech/audiocipher-stego-engine`
+- **Zoth Studio v2 Dossier**: `https://zoth.nullai.tech/tools/audiocipher-stego-engine`
+- **Local Workstation**: `http://127.0.0.1:8096`
+- **Version**: `2.5.0`
+- **Author**: 1nc0gn30 (`@1nc0gn30`, `https://1nc0gn30.si`) • NullAI (`https://nullai.tech`)
+- **License**: MIT (100% free and open-source; zero paywalls)
 
 ---
 
-## ✨ Features
+## Overview
 
-- 🔒 **Audio-Keyed Authenticated Encryption**: Derives 256-bit cryptographic keys using PBKDF2-HMAC-SHA256 from raw acoustic waveforms and precise decibel/volume modifiers. Encrypts payloads using authenticated keystream cipher + HMAC-SHA256 integrity tags.
-- 📡 **BFSK Acoustic Modem & Ultrasonic Covert Air-Gap Transfer**: Transmit data through physical air gaps via continuous-phase binary frequency shift keying (CPFSK). Supports audible Kansas City / Bell 202 frequencies (1200/2200 Hz) and covert ultrasonic frequencies (>18 kHz) with UART framing, CRC-16-CCITT validation, and matched-filter energy demodulation.
-- 🛡️ **PCM Audio Steganography**: Embeds secret files and strings into the least significant bits (LSB) of uncompressed 16-bit PCM WAV audio carriers with CRC32 integrity checksum validation and magic header verification.
-- 📻 **Acoustic Morse Code & Spectrogram Synthesizer**: Converts text messages into audible Morse code tone sequences and multi-frequency spectrogram visual patterns at configurable speed (WPM) and frequency (Hz).
-- 🎨 **AudioCipher Studio Web UI**: Real-time Web Audio API oscilloscope visualizer, interactive audio cipher ritual runner, drag-and-drop stego carrier injector, and 1-click WAV export (design influenced by Material 3 tokens).
-- ⚡ **Zero Third-Party Runtime Dependencies**: 100% Python Standard Library runtime (`wave`, `struct`, `hashlib`, `hmac`, `math`, `zlib`, `http.server`, `urllib`, `argparse`).
-- 🤖 **FastMCP Server Protocol**: Full Model Context Protocol (MCP) JSON-RPC 2.0 stdio server for Claude Desktop, Cursor, Cline, and autonomous AI agents.
+AudioCipher Stego Studio implements acoustic cryptography and waveform signal processing in both Python 3.9+ standard-library modules and client-side WebAudio/Canvas JavaScript:
+
+- **Audio-Keyed Encryption (`crypto_core.py`)**: Derives deterministic PBKDF2-HMAC-SHA256 keys from an audio file combined with a decibel volume parameter (`--volume`), authenticating ciphertexts via HMAC-SHA256.
+- **PCM WAV Steganography (`stego_engine.py`, `wav_codec.py`)**: Embeds and extracts arbitrary binary payloads in 16-bit PCM WAV sample LSBs and parity blocks, generating a synthetic harmonic chord carrier when no external WAV file is supplied.
+- **Statistical Steganalysis (`steganalysis.py`)**: Performs LSB distribution chi-square and sample-pair anomaly inspection on candidate WAV carriers.
+- **Morse & DTMF Codecs (`spectrogram.py`)**: Synthesizes ITU Morse WAV audio at configurable frequency and WPM, plus dual-tone multi-frequency (DTMF) synthesis and Goertzel frequency decoding.
+- **Acoustic BFSK Modem (`acoustic_modem.py`)**: Modulates and demodulates framed binary payloads over audible or ultrasonic (`>18 kHz`) binary frequency-shift keying (BFSK) with CRC verification.
 
 ---
 
-## 🚀 Quick Start
+## Architecture
 
-### Installation
+```
+audiocipher-stego-engine/
+├── bin/
+│   ├── audiocipher.js                     # Unified CLI / Web / Electron launcher
+│   └── audiocipher-stego-engine-tui       # ZothOS v3.4.0 Unicode U+2800 Braille TUI
+├── src/audiocipher_stego_engine/
+│   ├── crypto_core.py                     # Audio-file + volume dB PBKDF2 key derivation & cipher
+│   ├── wav_codec.py                       # Pure-stdlib 16-bit PCM WAV reader/writer & tone synth
+│   ├── stego_engine.py                    # LSB & parity-block WAV steganography
+│   ├── steganalysis.py                    # Chi-square & LSB anomaly forensics
+│   ├── spectrogram.py                     # ITU Morse & DTMF synthesis/decoding
+│   ├── acoustic_modem.py                  # Audible & ultrasonic BFSK modem
+│   ├── ui_server.py                       # HTTP server on 127.0.0.1:8096 with Origin CSRF guard
+│   ├── mcp_server.py                      # JSON-RPC 2.0 stdio MCP server (9 tools)
+│   └── cli.py                             # Command-line interface (`audiocipher` / `audio-stego`)
+├── public/                                # Standalone browser WebAudio & spectrogram studio
+└── tests/                                 # 13 pytest suites covering crypto, stego, modem, MCP & HTTP
+```
+
+### REST API Endpoints (`http://127.0.0.1:8096`)
+
+| Method | Path | Description |
+| :--- | :--- | :--- |
+| `GET` | `/health` (`/api/health`) | Service health status, version (`2.5.0`), and uptime |
+| `GET` | `/api/diagnostics` | Python runtime and zero-dependency status report |
+| `POST` | `/api/encrypt` | Encrypt payload with base64 audio key and `volume_db` |
+| `POST` | `/api/decrypt` | Decrypt ciphertext blob with base64 audio key and `volume_db` |
+| `POST` | `/api/stego/embed` | Embed payload into a supplied or synthesized PCM WAV carrier |
+| `POST` | `/api/stego/extract` | Extract hidden payload from a steganographic WAV carrier |
+| `POST` | `/api/steganalysis` | Run statistical steganalysis on a WAV carrier |
+| `POST` | `/api/morse` | Synthesize ITU Morse WAV audio from text |
+| `POST` | `/api/dtmf/synthesize` | Synthesize DTMF keypad tones to WAV |
+| `POST` | `/api/dtmf/decode` | Decode DTMF digits from WAV audio via Goertzel filter |
+| `POST` | `/api/fsk-modulate` | Modulate payload over audible or ultrasonic BFSK WAV |
+| `POST` | `/api/fsk-demodulate` | Demodulate BFSK WAV audio back into framed payload |
+
+---
+
+## Quickstart
+
 ```bash
-# Clone the repository
-git clone https://github.com/NullAITech/audiocipher-stego-engine.git
+git clone https://github.com/1nc0gn30/audiocipher-stego-engine.git
 cd audiocipher-stego-engine
 
-# Install in editable mode
+# Install console scripts (`audiocipher` and `audio-stego`)
 pip install -e .
+
+# Start the local web server on 127.0.0.1:8096
+python3 -m audiocipher_stego_engine.cli serve --port 8096
+```
+
+Verify the server from another terminal:
+
+```bash
+curl -s http://127.0.0.1:8096/health
+curl -s http://127.0.0.1:8096/api/diagnostics
 ```
 
 ---
 
-## 💻 CLI Usage
+## CLI & MCP Usage
+
+### CLI Subcommands (`audiocipher`)
 
 ```bash
-# Encrypt message using an audio file as key with 50 dB modifier
-audiocipher encrypt "Sovereign Agent Directive #757" -k secret_track.wav --volume 50.0 -o encrypted.bin
-
-# Decrypt payload using the exact audio key and volume level
-audiocipher decrypt encrypted.bin -k secret_track.wav --volume 50.0 -o decrypted.txt
-
-# Embed secret payload into a WAV audio carrier via LSB steganography
-audiocipher embed secret_notes.txt -c carrier.wav -o stego.wav
-
-# Extract hidden payload from steganographic WAV carrier
-audiocipher extract stego.wav -o recovered_secret.txt
-
-# Synthesize Morse code audio WAV from plaintext message
-audiocipher morse "SOS SOVEREIGN AGENT 757" --freq 800 --wpm 20 -o morse.wav
-
-# Transmit data over audible BFSK acoustic modem (1200/2200 Hz)
-audiocipher modem modulate "AIRGAP DIRECTIVE #42" -o modem.wav --baud 300
-
-# Transmit data over covert ultrasonic acoustic modem (>18 kHz, inaudible)
-audiocipher modem modulate "COVERT TOP SECRET" -o modem_ultra.wav --ultrasonic --baud 600
-
-# Demodulate acoustic modem recording and verify CRC-16
-audiocipher modem demodulate modem.wav -o received.txt
-
-# Launch AudioCipher Studio Web UI (Material 3 influenced)
-audiocipher serve --port 8096
-
-# Start FastMCP stdio server for LLM agents
-audiocipher mcp
-
-# Run system diagnostics
+# Help, version, JSON status, and internal self-test
+audiocipher --help
+audiocipher --version
+audiocipher --status --json
 audiocipher doctor
+audiocipher test-self
+
+# Audio-keyed file encryption & decryption
+audiocipher encrypt secret.txt -k carrier.wav --volume 42.5 -o secret.enc
+audiocipher decrypt secret.enc -k carrier.wav --volume 42.5 -o recovered.txt
+
+# PCM WAV LSB steganography & forensic steganalysis
+audiocipher embed secret.txt -o stego.wav
+audiocipher extract stego.wav -o extracted.txt
+audiocipher steganalysis stego.wav --json
+
+# ITU Morse synthesis & BFSK acoustic modem
+audiocipher morse "CQ DE ZOTH" --freq 800 --wpm 20 -o morse.wav
+audiocipher modem modulate "AIRGAP PACKET" --baud 300 --ultrasonic -o packet.wav
+audiocipher modem demodulate packet.wav --baud 300 --ultrasonic --json
+
+# Launch Web UI or stdio MCP server
+audiocipher serve --host 127.0.0.1 --port 8096
+audiocipher mcp
 ```
 
----
+### ZothOS v3.4.0 Braille TUI Integration
 
-## 🤖 Model Context Protocol (MCP) Setup
-
-Add `audiocipher-stego-engine` to your Claude Desktop or Cursor configuration:
-
-```json
-{
-  "mcpServers": {
-    "audiocipher": {
-      "command": "python3",
-      "args": ["-m", "audiocipher_stego_engine", "mcp"]
-    }
-  }
-}
-```
-
-### Registered MCP Tools:
-- `audio_encrypt`: Encrypt payload data using audio file bytes and decibel modifier.
-- `audio_decrypt`: Decrypt payload data using audio file bytes and decibel modifier.
-- `audio_stego_embed`: Hide payload inside a WAV carrier using LSB steganography.
-- `audio_stego_extract`: Extract hidden payload from a WAV carrier.
-- `audio_morse_synthesize`: Generate a synthesized Morse code WAV audio buffer from plaintext.
-- `audio_steganalysis`: Forensic statistical audit for LSB and spectral stego tampering.
-- `audio_modulate_fsk`: Modulate data into audible or ultrasonic BFSK waveform with CRC-16 framing.
-- `audio_demodulate_fsk`: Demodulate BFSK audio, recover payload, verify CRC-16, and report SNR telemetry.
-- `audio_diagnostics`: Platform and toolchain health check.
-
----
-
-## 📐 Mathematical Foundations
-
-### 1. Audio-Keyed Key Derivation (PBKDF2-HMAC-SHA256)
-Acoustic waveforms serve as high-entropy sources for key derivation. Given raw PCM audio bytes $A$ and volume threshold $V_{\text{dB}}$:
-
-$$\text{Salt} = \text{SHA-256}(A \parallel \text{IEEE-754}(V_{\text{dB}}))$$
-$$\text{Key} = \text{PBKDF2}(\text{HMAC-SHA256}, \text{password}=A, \text{salt}=\text{Salt}, \text{iterations}=100{,}000, \text{keylen}=32)$$
-
-### 2. Dual-Tone Multi-Frequency (DTMF) & Goertzel Algorithm
-DTMF encodes keypad symbols as simultaneous pairs of sinusoidal tones (one low group frequency $f_L \in \{697, 770, 852, 941\}\,\text{Hz}$ and one high group frequency $f_H \in \{1209, 1336, 1477, 1633\}\,\text{Hz}$):
-
-$$x[n] = A_1 \sin(2\pi f_L n / f_s) + A_2 \sin(2\pi f_H n / f_s)$$
-
-To detect tones without full $O(N \log N)$ FFT overhead, the Goertzel algorithm operates in $O(N)$ with recurrence:
-
-$$s_k[n] = x[n] + 2\cos\left(\frac{2\pi k}{N}\right) s_k[n-1] - s_k[n-2]$$
-
-where spectral energy power is extracted after $N$ samples:
-
-$$P_k = s_k^2[N] + s_k^2[N-1] - 2\cos\left(\frac{2\pi k}{N}\right) s_k[N] s_k[N-1]$$
-
-### 3. LSB Steganography Carrier Frame Structure
-PCM audio samples encode payload bits into the least significant bit of each 16-bit audio channel:
-
-```
-+------------------+---------------------+-------------------+------------------+
-| Magic (8 Bytes)  | Length (4 Bytes BE) | Payload (N Bytes) | CRC32 (4 Bytes)  |
-| "AUDSTG01"       | uint32_t            | Raw bytes         | IEEE 802.3       |
-+------------------+---------------------+-------------------+------------------+
-```
-
-### 4. Continuous-Phase BFSK & Matched-Filter Energy Demodulation
-Binary Frequency Shift Keying (BFSK) encodes bit $b \in \{0, 1\}$ as instantaneous frequency $f(t)$:
-
-$$f(t) = \begin{cases} f_{\text{mark}} & \text{if } b = 1 \\ f_{\text{space}} & \text{if } b = 0 \end{cases}$$
-
-Phase continuity is preserved across bit transitions to eliminate spectral splatter:
-
-$$\phi[n] = \left(\phi[n-1] + \frac{2\pi f[n]}{f_s}\right) \pmod{2\pi}, \quad s[n] = A \sin(\phi[n])$$
-
-At the demodulator, matched-filter energy quadrature correlation calculates the spectral power at $f_{\text{mark}}$ and $f_{\text{space}}$ over symbol window $N = \lfloor f_s / \text{baud} \rfloor$:
-
-$$E_{\text{mark}} = \left(\sum_{n=0}^{N-1} x[n] \cos\left(\frac{2\pi f_m n}{f_s}\right)\right)^2 + \left(\sum_{n=0}^{N-1} x[n] \sin\left(\frac{2\pi f_m n}{f_s}\right)\right)^2$$
-$$E_{\text{space}} = \left(\sum_{n=0}^{N-1} x[n] \cos\left(\frac{2\pi f_s n}{f_s}\right)\right)^2 + \left(\sum_{n=0}^{N-1} x[n] \sin\left(\frac{2\pi f_s n}{f_s}\right)\right)^2$$
-
-Bit decision $\hat{b} = \mathbb{I}(E_{\text{mark}} \ge E_{\text{space}})$. Packets are framed with preamble `0x55` sync, frame delimiter `0x7E`, 16-bit length header, payload bytes, and CRC-16-CCITT polynomial $x^{16} + x^{12} + x^5 + 1$.
-
----
-
-## 🏛️ Architecture
-
-```mermaid
-flowchart TD
-    subgraph AudioEngine["🎵 Acoustic Processing Core"]
-        Wav["PCM WAV Codec\n(8/16-bit Uncompressed)"]
-        Crypto["🔐 Audio-Keyed Cipher\n(PBKDF2 + Keystream + HMAC)"]
-        Stego["🛡️ LSB Steganographer\n(CRC32 + Header Guard)"]
-        Modem["📡 BFSK Acoustic Modem\n(Audible & Ultrasonic Air-Gap)"]
-        Spectro["📻 Morse & DTMF Synthesizer\n(Goertzel Tone Detector)"]
-    end
-
-    subgraph Channels["🖥️ User & AI Interfaces"]
-        CLI["💻 CLI Entrypoint\n(audiocipher / python -m)"]
-        MCP["🤖 FastMCP Stdio Server\n(Claude / Cursor / Cline)"]
-        UI["🎨 AudioCipher Studio\n(Web Audio API FFT & DTMF Dialpad)"]
-    end
-
-    Wav --> Crypto
-    Wav --> Stego
-    Wav --> Modem
-    Wav --> Spectro
-    Crypto --> Channels
-    Stego --> Channels
-    Modem --> Channels
-    Spectro --> Channels
-```
-
----
-
-## 🐍 Python SDK API Reference
-
-```python
-from audiocipher_stego_engine.acoustic_modem import FSKConfig, modulate_fsk, demodulate_fsk
-from audiocipher_stego_engine.crypto_core import derive_audio_key, encrypt_payload, decrypt_payload
-from audiocipher_stego_engine.spectrogram import synthesize_dtmf_audio, decode_dtmf_audio, synthesize_morse_audio
-from audiocipher_stego_engine.stego_engine import StegoEngine
-from audiocipher_stego_engine.wav_codec import AudioBuffer
-
-# 1. Transmit and recover data via BFSK acoustic modem (audible or ultrasonic)
-cfg = FSKConfig(baud_rate=300, ultrasonic=True)
-audio = modulate_fsk(b"COVERT AIRGAP PAYLOAD", cfg)
-decoded_bytes, telemetry = demodulate_fsk(audio, cfg)
-print(f"Recovered: {decoded_bytes.decode('utf-8')}, SNR: {telemetry['estimated_snr_db']} dB")
-
-# 2. Synthesize and decode DTMF phone key sequence
-dtmf_audio = synthesize_dtmf_audio("8675309#")
-decoded_digits = decode_dtmf_audio(dtmf_audio)
-print(f"Decoded DTMF: {decoded_digits}")  # "8675309#"
-
-# 3. Hide secret data in a carrier WAV
-carrier = AudioBuffer.generate_carrier_chord([440.0, 554.37, 659.25], duration=2.0)
-stego_audio = StegoEngine.embed_lsb(carrier, b"CLASSIFIED_PAYLOAD_99")
-recovered = StegoEngine.extract_lsb(stego_audio)
-print(f"Recovered: {recovered.decode('utf-8')}")
-
-# 4. Acoustic-keyed authenticated encryption
-tone = AudioBuffer.generate_sine_tone(440.0, 1.0)
-key, salt = derive_audio_key(tone.to_wav_bytes(), volume_db=50.0)
-ciphertext = encrypt_payload(b"Agent Directive", key, salt)
-```
-
----
-
-## 🧪 Running Tests
+On ZothOS v3.4.0, `audiocipher` and `audiocipher-stego-engine-tui` integrate with Zoth Studio v2 (`https://zoth.nullai.tech/tools/audiocipher-stego-engine`):
 
 ```bash
-pytest -v
+./bin/audiocipher-stego-engine-tui --help
+./bin/audiocipher-stego-engine-tui --json
 ```
 
----
+### MCP Server (`audiocipher mcp`)
 
-## 💎 100% Free & Open Access (Zero Paywalls)
-
-AudioCipher Studio functions as a **100% Client-Side In-Browser Sovereign Application** deployable to Netlify, Vercel, or GitHub Pages with zero external cloud egress:
-
-- **100% In-Browser Execution**: Acoustic key derivation (PBKDF2 10,000 rounds + AES-GCM), PCM audio LSB steganography, DTMF Goertzel frequency decoding, ITU Morse synthesis, and ultrasonic BFSK modem air-gap transfer execute directly via native Web Audio API and Web Crypto API. Zero server communication or audio telemetry occurs.
-- **Zero Paywalls & Zero Blur Locks**: All features, LSB steganography embeddings, raw binary WAV downloads, DTMF decodes, and ultrasonic transmissions are 100% unlocked and free by default.
-- **Optional Community Support Architecture**:
-  - **☕ Buy Us a Coffee (Stripe)**: [https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X](https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X)
-  - **◎ Solana Wallet Tip Address**: `GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK` (`solana:GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK`)
-- **Verified Triple-Viewport Responsiveness**: Automated headless browser testing across Mobile (375px), Tablet (768px), and Desktop (1280px+) with 0 console errors and 0px horizontal overflow.
-
----
-
-## 📜 License & Attribution
-
-MIT License © 2026 NullAITech
-
-**Engineered by [1nc0gn30 • NullAI](https://nullai.tech) ([@1nc0gn30](https://github.com/1nc0gn30)) • [NullAI Platform](https://nullai.tech)**
+Exposed JSON-RPC 2.0 stdio tools:
+1. `audio_encrypt` — Encrypt text/base64 payload using an audio file key and `volume_db`.
+2. `audio_decrypt` — Authenticate and decrypt an audio-keyed ciphertext blob.
+3. `audio_stego_embed` — Hide a payload inside a PCM WAV carrier.
+4. `audio_stego_extract` — Recover an embedded payload from a WAV carrier.
+5. `audio_morse_synthesize` — Generate ITU Morse notation and base64 WAV audio.
+6. `audio_diagnostics` — Return platform and codec health telemetry.
+7. `audio_steganalysis` — Run forensic LSB statistical analysis on WAV data.
+8. `audio_modulate_fsk` — Modulate payload bytes into audible/ultrasonic BFSK WAV audio.
+9. `audio_demodulate_fsk` — Demodulate BFSK WAV audio back into plaintext/bytes.
 
 ---
 
-## 🏛️ ZothOS v3.4, Zoth Studio v2 & Obsidian Second Brain Ecosystem
-
-### Cross-Surface Integration Matrix
-
-| Surface | Endpoint / Binary | Capabilities |
-| :--- | :--- | :--- |
-| **Standalone Workstation** | `http://127.0.0.1:8096` | 100% Free & Open-Access Web Deck, live `/health` & REST telemetry |
-| **Zoth Studio v2 Route** | `http://127.0.0.1:3000/tools/audiocipher-stego-engine` | Interactive God-Mode component inside Zoth Studio (`https://zoth.nullai.tech`) |
-| **ZothOS v3.4 CLI & TUI** | `audiocipher-stego-engine` / `audiocipher-stego-engine-tui` | Global binary in `/usr/local/bin/` with Unicode `U+2800` Braille TUI & `--json` output |
-| **ZothOS-Lite Web Desktop** | `http://127.0.0.1:8145` | Browser-native KDE-style window manager & terminal launcher |
-| **Zoth Obsidian Tracker** | `http://127.0.0.1:8151` | Interactive Obsidian Second Brain vault explorer (`~/Documents/Obsidian Vault/Studio/Tools/Studio audiocipher-stego-engine.md`) |
-| **Neuro-Memory STDP Cortex** | `http://127.0.0.1:8094` | 3-Factor STDP synaptic memory daemon & 21-tool MCP server |
+## Testing & Verification
 
 ```bash
-# Inspect CLI & Unicode U+2800 Braille TUI on ZothOS v3.4
-audiocipher-stego-engine --help
-audiocipher-stego-engine-tui --status
-audiocipher-stego-engine-tui --json
-
-# Verify Second Brain Vault & 12-Step Verification Gallery on :8151
-zoth-obsidian-tracker --verify
+python3 -m pytest -q
 ```
 
+CI runs the full 13-file pytest matrix across Ubuntu (Python 3.10–3.13), macOS, and Windows.
+
+---
+
+## Support
+
+This project is 100% free and open-source with zero paywalls or feature gates. Optional support: [Buy Us a Coffee (Stripe)](https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X).
+
+## License
+
+MIT License — Engineered by **1nc0gn30** (`@1nc0gn30`, `https://1nc0gn30.si`) • **NullAI** (`https://nullai.tech`).

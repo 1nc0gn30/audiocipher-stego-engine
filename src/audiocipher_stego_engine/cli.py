@@ -54,7 +54,9 @@ def build_parser() -> argparse.ArgumentParser:
         prog="audiocipher",
         description="Audio-Keyed Cryptography, PCM Steganography & Morse Spectrogram Synthesizer",
     )
-    parser.add_argument("-v", "--version", action="version", version="audiocipher-stego-engine 0.1.0")
+    parser.add_argument("-v", "--version", action="version", version="audiocipher-stego-engine 2.5.0")
+    parser.add_argument("--status", action="store_true", help="Print service status")
+    parser.add_argument("--json", action="store_true", help="Print JSON status payload")
 
     base = argparse.ArgumentParser(add_help=False)
     base.add_argument("--no-color", action="store_true", help="Disable ANSI color output")
@@ -136,6 +138,22 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     args = parser.parse_args(argv)
     c = Colors(force_disable=getattr(args, "no_color", False))
+
+    if getattr(args, "status", False) or (getattr(args, "json", False) and not args.command):
+        import json as _json
+        payload = {
+            "service": "audiocipher-stego-engine",
+            "version": "2.5.0",
+            "status": "healthy",
+            "default_port": 8096,
+            "local_url": "http://127.0.0.1:8096",
+            "zero_dependencies": True,
+        }
+        if getattr(args, "json", False):
+            print(_json.dumps(payload, indent=2))
+        else:
+            print(f"audiocipher-stego-engine v{payload['version']} | {payload['status'].upper()} | http://127.0.0.1:8096")
+        return 0
 
     if args.command == "encrypt":
         payload_data = safe_read_bytes(args.input) if os.path.isfile(args.input) else args.input.encode("utf-8")

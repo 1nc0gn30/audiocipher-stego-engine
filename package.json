@@ -26,7 +26,7 @@
     "electron",
     "zoth"
   ],
-  "author": "NullAI Tech / Zoth Team",
+  "author": "1nc0gn30 (@1nc0gn30)",
   "license": "MIT",
   "devDependencies": {
     "electron": "^34.5.8"
