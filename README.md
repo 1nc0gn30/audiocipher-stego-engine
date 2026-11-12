@@ -45,6 +45,7 @@ audiocipher-stego-engine/
 │   ├── mcp_server.py                      # JSON-RPC 2.0 stdio MCP server (9 tools)
 │   └── cli.py                             # Command-line interface (`audiocipher` / `audio-stego`)
 ├── public/                                # Standalone browser WebAudio & spectrogram studio
+├── server.py                              # Standalone loopback daemon entrypoint (:8096)
 └── tests/                                 # 13 pytest suites covering crypto, stego, modem, MCP & HTTP
 ```
 
@@ -77,6 +78,8 @@ cd audiocipher-stego-engine
 pip install -e .
 
 # Start the local web server on 127.0.0.1:8096
+python3 server.py --port 8096
+# or via CLI module:
 python3 -m audiocipher_stego_engine.cli serve --port 8096
 ```
 
