@@ -500,13 +500,7 @@
       background: var(--zoth-card-hover);
     }
 
-    /* Output Containers and Frosted Paywall */
-    .paywall-wrap {
-      position: relative;
-      margin-top: 1rem;
-      border-radius: 8px;
-      overflow: hidden;
-    }
+    /* Output Containers */
     .result-box {
       background: #08080B;
       border: 1px solid var(--zoth-border);
@@ -520,41 +514,6 @@
       overflow-y: auto;
       color: #A6F4C5;
       transition: filter 0.3s;
-    }
-    .paywall-wrap.locked .result-box {
-      filter: none;
-      user-select: none;
-      pointer-events: none;
-    }
-    .paywall-overlay {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background: rgba(8, 8, 11, 0.7);
-      backdrop-filter: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      text-align: center;
-      padding: 1rem;
-      z-index: 5;
-    }
-    .paywall-wrap.locked .paywall-overlay {
-      display: flex;
-    }
-    .paywall-overlay-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--zoth-gold-light);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .paywall-overlay-desc {
-      font-size: 0.78rem;
-      color: var(--zoth-text-muted);
-      max-width: 320px;
     }
 
     /* DTMF Keypad Grid */
@@ -601,7 +560,7 @@
       display: block;
     }
 
-    /* Pro Paywall Modal */
+    /* Modal */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -745,22 +704,6 @@
       } catch (e) {}
     })();
   </script>
-  <style id="zoth-open-access-override">
-    .paywall-overlay, .output-paywall-overlay, #outputPaywallOverlay, #schemaPaywallOverlay,
-    #transformerPaywallOverlay, #proPaywallModal, #licenseModal, #salesBanner, #founding-offer-banner,
-    #funnelHeroBanner, [data-alias="paywallOverlay"], [data-alias="founding-offer-banner"] {
-      display: none !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
-    .paywall-wrap #outputPreview, .paywall-wrap #reportContentArea, .paywall-content,
-    .paywall-content.locked, .paywall-wrap.is-locked #outputPreview, .paywall-wrap.locked #outputPreview {
-      filter: none !important;
-      -webkit-filter: none !important;
-      user-select: auto !important;
-      pointer-events: auto !important;
-    }
-  </style>
 
 </head>
 <body>
@@ -768,6 +711,7 @@
 <div id="zoth-coffee-support-bar" style="background: linear-gradient(90deg, rgba(16,185,129,0.12), rgba(212,175,55,0.14)); border-bottom: 1px solid rgba(212,175,55,0.35); padding: 8px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; z-index: 9999;">
   <span style="color: #10B981; font-weight: 800;">✦ 100% FREE &amp; OPEN ACCESS · ZERO PAYWALLS</span>
   <a href="https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X" target="_blank" rel="noopener noreferrer" style="background: #D4AF37; color: #08080B; padding: 4px 12px; border-radius: 6px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">☕ Buy Us a Coffee (Stripe)</a>
+  <a href="solana:GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK" onclick="if(navigator.clipboard){navigator.clipboard.writeText('GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK');this.textContent='✓ Copied GG2eQb...dXoK!';}" style="background: rgba(20,241,149,0.15); color: #14F195; border: 1px solid rgba(20,241,149,0.45); padding: 4px 12px; border-radius: 6px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">◎ Solana Tip (GG2e...dXoK)</a>
 </div>
 
 
@@ -848,7 +792,7 @@
         </div>
 
         <!-- Output Box -->
-        <div class="result-wrap" id="encPaywallWrap" style="margin-top:1rem;">
+        <div class="result-wrap" id="encResultWrap" style="margin-top:1rem;">
           <div class="result-box" id="enc-result">Ready for cryptographic operation. Click Encrypt to derive acoustic key.</div>
         </div>
       </div>
@@ -866,7 +810,7 @@
         </div>
 
         <!-- Stego Output Wrap -->
-        <div class="result-wrap" id="stegoPaywallWrap" style="margin-top:1rem;">
+        <div class="result-wrap" id="stegoResultWrap" style="margin-top:1rem;">
           <div class="result-box" id="stego-result">Ready for steganographic injection. Carrier synthesis is 100% in-browser.</div>
         </div>
       </div>
