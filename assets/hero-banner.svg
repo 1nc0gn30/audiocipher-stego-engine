@@ -1,12 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="100%" height="100%" role="img" aria-label="AudioCipher Stego Studio v2.6.0 Banner">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#06070B"/>
-      <stop offset="50%" stop-color="#0C101B"/>
-      <stop offset="100%" stop-color="#07080E"/>
+      <stop offset="0%" stop-color="#07080D"/>
+      <stop offset="50%" stop-color="#0E121E"/>
+      <stop offset="100%" stop-color="#08090F"/>
     </linearGradient>
     <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#D4AF37"/>
+      <stop offset="0%" stop-color="#E5C158"/>
       <stop offset="100%" stop-color="#38BDF8"/>
     </linearGradient>
     <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
@@ -14,43 +14,52 @@
     </pattern>
   </defs>
 
-  <rect width="1200" height="320" rx="18" fill="url(#bg)" stroke="#D4AF37" stroke-opacity="0.5" stroke-width="1.5"/>
+  <rect width="1200" height="320" rx="18" fill="url(#bg)" stroke="#D4AF37" stroke-opacity="0.55" stroke-width="1.5"/>
   <rect width="1200" height="320" rx="18" fill="url(#grid)"/>
 
-  <!-- Emblem -->
-  <g transform="translate(52, 48)">
-    <rect width="78" height="78" rx="18" fill="url(#accent)" opacity="0.92"/>
-    <polygon points="39,14 62,27 62,51 39,64 16,51 16,27" fill="#08080B" stroke="#FFFFFF" stroke-width="2"/>
-    <circle cx="39" cy="39" r="7" fill="#D4AF37"/>
+  <!-- Acoustic Waveform + Lock Emblem -->
+  <g transform="translate(52, 46)">
+    <rect width="82" height="82" rx="18" fill="#101524" stroke="#D4AF37" stroke-width="2"/>
+    <!-- Waveform bars -->
+    <rect x="14" y="34" width="6" height="16" rx="3" fill="#38BDF8"/>
+    <rect x="24" y="22" width="6" height="40" rx="3" fill="#D4AF37"/>
+    <rect x="34" y="14" width="6" height="56" rx="3" fill="#E5C158"/>
+    <rect x="44" y="24" width="6" height="36" rx="3" fill="#38BDF8"/>
+    <rect x="54" y="30" width="6" height="24" rx="3" fill="#D4AF37"/>
+    <rect x="64" y="36" width="6" height="12" rx="3" fill="#10B981"/>
+    <!-- Lock badge -->
+    <circle cx="62" cy="62" r="14" fill="#08080B" stroke="#D4AF37" stroke-width="2"/>
+    <rect x="56" y="60" width="12" height="9" rx="2" fill="#D4AF37"/>
+    <path d="M59 60 v-3 a3 3 0 0 1 6 0 v3" fill="none" stroke="#D4AF37" stroke-width="2"/>
   </g>
 
   <!-- Header Copy -->
-  <g transform="translate(152, 62)">
-    <rect x="0" y="-14" width="420" height="22" rx="11" fill="rgba(255,255,255,0.06)" stroke="#D4AF37" stroke-opacity="0.45"/>
-    <text x="12" y="1" fill="#D4AF37" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" letter-spacing="1.1">SOVEREIGN // NULLAI ENGINE // PORT :3000</text>
-    <text x="0" y="34" fill="#FFFFFF" font-family="Syne, Space Grotesk, sans-serif" font-size="30" font-weight="800" letter-spacing="0.4">AUDIOCIPHER STEGO ENGINE</text>
-    <text x="0" y="60" fill="#94A3B8" font-family="Inter, sans-serif" font-size="13.5">Client-side audio steganography engine, spectrogram encoder, and watermark analyzer.</text>
+  <g transform="translate(156, 60)">
+    <rect x="0" y="-14" width="520" height="22" rx="11" fill="rgba(212,175,55,0.10)" stroke="#D4AF37" stroke-opacity="0.45"/>
+    <text x="14" y="1" fill="#E5C158" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" font-weight="700" letter-spacing="1.1">LOCAL DAEMON :8096 // v2.6.0 // 9-TOOL STDIO MCP // ZERO-EGRESS</text>
+    <text x="0" y="36" fill="#FFFFFF" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="30" font-weight="800" letter-spacing="0.4">AUDIOCIPHER STEGO STUDIO</text>
+    <text x="0" y="62" fill="#94A3B8" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="13.5">Key-separated acoustic cryptography, 16-bit PCM WAV LSB stego, steganalysis, DTMF/Morse DSP &amp; BFSK modem.</text>
   </g>
 
   <!-- 3 Feature Cards -->
   <g transform="translate(52, 168)">
-    <rect x="0" y="0" width="352" height="98" rx="12" fill="#101320" stroke="#D4AF37" stroke-opacity="0.38"/>
-    <text x="18" y="30" fill="#D4AF37" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">PILLAR 01 // CAPABILITY</text>
-    <text x="18" y="56" fill="#FFFFFF" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="700">Zero-Egress Client Enclave</text>
-    <text x="18" y="78" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="10.5">Verified Client &amp; Enclave Runtime</text>
+    <rect x="0" y="0" width="352" height="98" rx="12" fill="#101320" stroke="#D4AF37" stroke-opacity="0.42"/>
+    <text x="18" y="28" fill="#E5C158" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" font-weight="700">PILLAR 01 // CRYPTO &amp; STEGO</text>
+    <text x="18" y="54" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="14" font-weight="700">v2 Key-Separated Cipher &amp; LSB PCM</text>
+    <text x="18" y="76" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10.5">200k PBKDF2 • STEG+CRC32 • Chi-Sq Forensics</text>
 
-    <rect x="372" y="0" width="352" height="98" rx="12" fill="#101320" stroke="#38BDF8" stroke-opacity="0.38"/>
-    <text x="390" y="30" fill="#38BDF8" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">PILLAR 02 // ARCHITECTURE</text>
-    <text x="390" y="56" fill="#FFFFFF" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="700">Real-Time Telemetry &amp; AST</text>
-    <text x="390" y="78" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="10.5">Mode: BROWSER • Port :3000</text>
+    <rect x="372" y="0" width="352" height="98" rx="12" fill="#101320" stroke="#38BDF8" stroke-opacity="0.42"/>
+    <text x="390" y="28" fill="#38BDF8" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" font-weight="700">PILLAR 02 // ACOUSTIC DSP</text>
+    <text x="390" y="54" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="14" font-weight="700">BFSK Air-Gap Modem, DTMF &amp; Morse</text>
+    <text x="390" y="76" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10.5">0x55/0x7E+CRC-16 • Goertzel • Port :8096</text>
 
-    <rect x="744" y="0" width="352" height="98" rx="12" fill="#101320" stroke="#D4AF37" stroke-opacity="0.38"/>
-    <text x="762" y="30" fill="#D4AF37" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">PILLAR 03 // ECOSYSTEM</text>
-    <text x="762" y="56" fill="#FFFFFF" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="700">Zoth Studio &amp; ZothOS Native</text>
-    <text x="762" y="78" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="10.5">Zoth Studio v2 (:3000) &amp; ZothOS v3.4</text>
+    <rect x="744" y="0" width="352" height="98" rx="12" fill="#101320" stroke="#10B981" stroke-opacity="0.42"/>
+    <text x="762" y="28" fill="#10B981" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" font-weight="700">PILLAR 03 // ECOSYSTEM</text>
+    <text x="762" y="54" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="14" font-weight="700">Zoth Studio v2 &amp; ZothOS Native</text>
+    <text x="762" y="76" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10.5">Hybrid :8096 + Browser • 9 MCP Tools • TUI</text>
   </g>
 
-  <text x="600" y="298" text-anchor="middle" fill="#64748B" font-family="JetBrains Mono, monospace" font-size="10.5">
-    ENGINEERED BY 1NC0GN30 • NULLAI (@1nc0gn30)  •  NULLAI PLATFORM  •  ZOTH.NULLAI.TECH
+  <text x="600" y="298" text-anchor="middle" fill="#94A3B8" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5">
+    ENGINEERED BY NEAL FRAZIER TECH (@1nc0gn30)  •  NULLAI PLATFORM  •  ZOTH.NULLAI.TECH
   </text>
 </svg>

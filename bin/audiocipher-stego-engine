@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+"""AudioCipher Stego Studio (v2.6.0) — Unified ZothOS & Local Workstation CLI."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+import urllib.request
+from pathlib import Path
+
+TOOL_ID = "audiocipher-stego-engine"
+TOOL_REPO = "audiocipher-stego-engine"
+TOOL_NAME = "AudioCipher Stego Studio"
+TOOL_DESC = (
+    "Acoustic cryptography (v2 key-separated PBKDF2), 16-bit PCM WAV LSB/parity "
+    "steganography, forensic steganalysis, DTMF Goertzel codec, ITU Morse synthesizer, "
+    "and audible/ultrasonic BFSK air-gap modem."
+)
+TOOL_VERSION = "2.6.0"
+TOOL_CATEGORY = "Security & OpSec"
+TOOL_PORT = int(os.environ.get("AUDIOCIPHER_PORT", "8096"))
+STUDIO_URL = f"http://127.0.0.1:3000/tools/{TOOL_ID}"
+LOCAL_PORT_URL = f"http://127.0.0.1:{TOOL_PORT}"
+VENV_PYTHON = "/opt/zothos-ai-env/bin/python3"
+
+NATIVE_SUBCOMMANDS = frozenset({
+    "encrypt",
+    "decrypt",
+    "embed",
+    "extract",
+    "morse",
+    "steganalysis",
+    "modem",
+    "serve",
+    "mcp",
+    "doctor",
+    "diagnostics",
+    "platform",
+    "test-self",
+})
+
+
+def resolve_repo_dir() -> str:
+    """Probe /opt/audiocipher-stego-engine first, then ~/NullAITech/audiocipher-stego-engine, then relative."""
+    candidates = [
+        os.environ.get("AUDIOCIPHER_REPO_DIR", ""),
+        "/opt/audiocipher-stego-engine",
+        os.path.expanduser("~/NullAITech/audiocipher-stego-engine"),
+        str(Path(__file__).resolve().parent.parent),
+    ]
+    for cand in candidates:
+        if cand and os.path.isfile(os.path.join(cand, "server.py")):
+            return cand
+    return "/opt/audiocipher-stego-engine"
+
+
+def resolve_python() -> str:
+    return VENV_PYTHON if os.path.isfile(VENV_PYTHON) else sys.executable
+
+
+def probe_daemon(port: int = TOOL_PORT) -> tuple[bool, dict | None]:
+    try:
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{port}/health",
+            headers={"Origin": f"http://127.0.0.1:{port}"},
+        )
+        with urllib.request.urlopen(req, timeout=1.8) as resp:
+            if resp.status == 200:
+                return True, json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        pass
+    return False, None
+
+
+def main() -> int:
+    repo_dir = resolve_repo_dir()
+    src_dir = os.path.join(repo_dir, "src")
+    py_cli = os.path.join(src_dir, "audiocipher_stego_engine", "cli.py")
+    py_bin = resolve_python()
+    args = sys.argv[1:]
+
+    if "--electron" in args or (args and args[0] in ("desktop", "electron")):
+        rem = [a for a in args if a not in ("--electron", "desktop", "electron")]
+        elec = shutil.which("electron") or "/usr/local/bin/electron"
+        return subprocess.run(
+            [elec, os.path.join(repo_dir, "electron", "main.cjs")] + rem,
+            cwd=repo_dir,
+        ).returncode
+
+    if "--tui" in args or (args and args[0] == "tui"):
+        rem = [a for a in args if a not in ("--tui", "tui")]
+        tui_bin = shutil.which(f"{TOOL_ID}-tui") or os.path.join(repo_dir, "bin", f"{TOOL_ID}-tui")
+        return subprocess.run([tui_bin] + rem).returncode
+
+    if args and args[0] == "serve":
+        rem = args[1:]
+        cmd = [py_bin, os.path.join(repo_dir, "server.py")]
+        if "--host" not in rem:
+            cmd += ["--host", "127.0.0.1"]
+        if "--port" not in rem and "-p" not in rem:
+            cmd += ["--port", str(TOOL_PORT)]
+        cmd += rem
+        return subprocess.run(cmd, cwd=repo_dir).returncode
+
+    if args and args[0] in NATIVE_SUBCOMMANDS and os.path.isfile(py_cli):
+        env = os.environ.copy()
+        env["PYTHONPATH"] = src_dir + os.pathsep + env.get("PYTHONPATH", "")
+        return subprocess.run(
+            [py_bin, "-m", "audiocipher_stego_engine.cli"] + args,
+            cwd=repo_dir,
+            env=env,
+        ).returncode
+
+    parser = argparse.ArgumentParser(
+        prog=TOOL_ID,
+        description=f"{TOOL_NAME} (v{TOOL_VERSION}) — {TOOL_DESC}",
+        epilog="Subcommands: serve, mcp, doctor, test-self, encrypt, decrypt, embed, extract, morse, steganalysis, modem, tui, desktop",
+    )
+    parser.add_argument("--version", "-v", action="version", version=f"{TOOL_ID} v{TOOL_VERSION}")
+    parser.add_argument("--status", action="store_true", help="Check local installation & :8096 daemon status")
+    parser.add_argument("--json", action="store_true", help="Output deterministic JSON telemetry")
+    parser.add_argument("--ui", action="store_true", help="Print local Zoth Studio workbench URL")
+    parser.add_argument("--port", type=int, default=TOOL_PORT, help="Loopback daemon port (default: 8096)")
+    parsed, _ = parser.parse_known_args(args)
+
+    online, health = probe_daemon(parsed.port)
+    local_url = f"http://127.0.0.1:{parsed.port}"
+
+    info = {
+        "id": TOOL_ID,
+        "repo": TOOL_REPO,
+        "name": TOOL_NAME,
+        "version": TOOL_VERSION,
+        "category": TOOL_CATEGORY,
+        "installed": os.path.isdir(repo_dir) and os.path.isfile(py_cli),
+        "repo_path": repo_dir,
+        "native_cli": py_cli,
+        "studio_workbench_url": STUDIO_URL,
+        "local_endpoint": local_url,
+        "mcp_command": f"{TOOL_ID} mcp",
+        "mcp_tools_count": 9,
+        "daemon_online": online,
+        "daemon_health": health,
+        "license": "100% Free & Open Access (Zero Paywalls)",
+        "support": {
+            "stripe_buy_coffee": "https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X",
+            "solana_wallet": "GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK",
+        },
+        "status": "ONLINE" if online else "READY",
+    }
+
+    if parsed.json:
+        print(json.dumps(info, indent=2))
+        return 0
+
+    if parsed.ui:
+        print(STUDIO_URL)
+        return 0
+
+    print(f"✦ {TOOL_NAME} (v{TOOL_VERSION}) — [{TOOL_CATEGORY}]")
+    print(f"  Install Path : {repo_dir}")
+    print(f"  Daemon       : {'ONLINE (' + local_url + ')' if online else 'READY (CLI Mode — ' + local_url + ' idle)'}")
+    print(f"  Workbench    : {STUDIO_URL}")
+    print(f"  MCP Server   : {TOOL_ID} mcp (9 JSON-RPC 2.0 tools)")
+    print("  Access       : 100% Free & Open Access (☕ https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

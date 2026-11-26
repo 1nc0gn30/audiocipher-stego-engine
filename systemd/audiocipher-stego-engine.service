@@ -1,0 +1,25 @@
+[Unit]
+Description=AudioCipher Stego Studio — Acoustic Cryptography, PCM LSB Stego & BFSK Modem Daemon (:8096)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/audiocipher-stego-engine
+ExecStart=/opt/zothos-ai-env/bin/python3 /opt/audiocipher-stego-engine/server.py --host 127.0.0.1 --port 8096
+Restart=on-failure
+RestartSec=5
+KillMode=control-group
+TimeoutStopSec=10
+Environment=PATH=/opt/zothos-ai-env/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONUNBUFFERED=1
+
+# Hardening & Resource Ceilings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/tmp /var/tmp
+MemoryMax=512M
+CPUQuota=75%
+
+[Install]
+WantedBy=multi-user.target

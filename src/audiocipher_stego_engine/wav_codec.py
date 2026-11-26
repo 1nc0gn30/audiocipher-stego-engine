@@ -10,7 +10,9 @@ import math
 import struct
 import wave
 from dataclasses import dataclass
-from typing import Any, List, Optional, Tuple, Union
+from typing import List
+
+MAX_WAV_FRAMES = 4_800_000
 
 
 @dataclass
@@ -51,29 +53,56 @@ class AudioBuffer:
 
     @classmethod
     def from_wav_bytes(cls, data: bytes) -> AudioBuffer:
-        """Decode standard RIFF/WAVE PCM bytes into AudioBuffer."""
+        """Decode standard RIFF/WAVE PCM bytes into AudioBuffer with header-bomb protection."""
+        if not isinstance(data, (bytes, bytearray)) or len(data) < 44:
+            raise ValueError("Invalid WAV data: buffer too small to contain RIFF/WAVE header.")
+
         bio = io.BytesIO(data)
-        with wave.open(bio, "rb") as wf:
-            channels = wf.getnchannels()
-            sample_width = wf.getsampwidth()
-            sample_rate = wf.getframerate()
-            num_frames = wf.getnframes()
-            raw_frames = wf.readframes(num_frames)
+        try:
+            with wave.open(bio, "rb") as wf:
+                channels = wf.getnchannels()
+                sample_width = wf.getsampwidth()
+                sample_rate = wf.getframerate()
+                num_frames = wf.getnframes()
 
-            total_samples = num_frames * channels
-            if sample_width == 2:
-                samples = list(struct.unpack(f"<{total_samples}h", raw_frames))
-            elif sample_width == 1:
-                samples = list(struct.unpack(f"<{total_samples}B", raw_frames))
-            else:
-                raise ValueError(f"Unsupported sample width: {sample_width} (only 8/16-bit supported)")
+                if channels < 1 or channels > 8:
+                    raise ValueError(f"Unsupported channel count: {channels}")
+                if sample_rate <= 0 or sample_rate > 384_000:
+                    raise ValueError(f"Invalid sample rate: {sample_rate}")
+                if sample_width not in (1, 2):
+                    raise ValueError(f"Unsupported sample width: {sample_width} (only 8/16-bit supported)")
+                if num_frames < 0 or num_frames > MAX_WAV_FRAMES:
+                    raise ValueError(
+                        f"WAV frame count {num_frames} exceeds safety limit ({MAX_WAV_FRAMES} frames)"
+                    )
 
-            return cls(
-                sample_rate=sample_rate,
-                channels=channels,
-                sample_width=sample_width,
-                samples=samples
-            )
+                expected_bytes = num_frames * channels * sample_width
+                if expected_bytes > len(data):
+                    raise ValueError(
+                        f"Corrupted WAV header: declares {num_frames} frames ({expected_bytes} bytes) "
+                        f"exceeding payload size ({len(data)} bytes)"
+                    )
+
+                raw_frames = wf.readframes(num_frames)
+                if len(raw_frames) < expected_bytes:
+                    raise ValueError(
+                        f"Truncated WAV audio data: expected {expected_bytes} bytes, got {len(raw_frames)}"
+                    )
+
+                total_samples = num_frames * channels
+                if sample_width == 2:
+                    samples = list(struct.unpack(f"<{total_samples}h", raw_frames[:expected_bytes]))
+                else:
+                    samples = list(struct.unpack(f"<{total_samples}B", raw_frames[:expected_bytes]))
+
+                return cls(
+                    sample_rate=sample_rate,
+                    channels=channels,
+                    sample_width=sample_width,
+                    samples=samples,
+                )
+        except wave.Error as exc:
+            raise ValueError(f"Invalid WAV container: {exc}") from exc
 
     @classmethod
     def generate_sine_tone(
@@ -86,6 +115,8 @@ class AudioBuffer:
     ) -> AudioBuffer:
         """Generate a pure sinusoidal acoustic tone."""
         total_frames = int(sample_rate * duration)
+        if total_frames > MAX_WAV_FRAMES:
+            raise ValueError(f"Requested frame count {total_frames} exceeds MAX_WAV_FRAMES ({MAX_WAV_FRAMES})")
         samples: List[int] = []
         max_amp = 32767 * max(0.0, min(1.0, amplitude))
 
@@ -112,6 +143,8 @@ class AudioBuffer:
     ) -> AudioBuffer:
         """Synthesize a rich harmonic acoustic carrier with multiple frequency components."""
         total_frames = int(sample_rate * duration)
+        if total_frames > MAX_WAV_FRAMES:
+            raise ValueError(f"Requested frame count {total_frames} exceeds MAX_WAV_FRAMES ({MAX_WAV_FRAMES})")
         samples: List[int] = []
         scale = (32767 * amplitude) / max(1, len(frequencies))
 

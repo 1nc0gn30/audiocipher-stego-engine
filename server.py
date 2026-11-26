@@ -2,7 +2,7 @@
 """
 AudioCipher Stego Engine - Autonomous Standalone Web Workstation Server
 Port :8096 | Zero External Runtime Dependencies
-Engineered by 1nc0gn30 (@1nc0gn30) • NullAI Platform
+Engineered by Neal Frazier Tech (@1nc0gn30) • NullAI Platform
 """
 
 import argparse
@@ -30,7 +30,7 @@ def main():
     if args.status or args.json:
         payload = {
             "service": "audiocipher-stego-engine",
-            "version": "2.5.0",
+            "version": "2.6.0",
             "category": "Security & Audio",
             "port": args.port,
             "status": "READY",

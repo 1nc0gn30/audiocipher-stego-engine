@@ -1,20 +1,21 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=AudioCipher Studio
-GenericName=Acoustic Steganography & Audio Cryptography Workstation
-Comment=Acoustic Cryptography, High-Frequency Steganography, Audio Spectrogram Synthesis & FSK Modem
-Exec=/usr/local/bin/audiocipher desktop
-Icon=audiocipher
+Name=AudioCipher Stego Studio
+GenericName=Acoustic Cryptography & Steganography Workstation
+Comment=Zero-egress acoustic cryptography, 16-bit PCM WAV LSB steganography, forensic steganalysis, DTMF Goertzel decoder, ITU Morse synthesizer, and ultrasonic BFSK air-gap modem.
+Exec=/usr/local/bin/audiocipher-stego-engine desktop
+TryExec=/usr/local/bin/audiocipher-stego-engine
+Icon=audiocipher-stego-engine
 Terminal=false
-Categories=AudioVideo;Security;Development;System;Utility;
+Categories=X-Zoth-Security;AudioVideo;Security;Development;Utility;
 StartupNotify=true
-Actions=CLI;Web;
+Actions=TUI;WebApp;
 
-[Desktop Action CLI]
-Name=Open AudioCipher CLI
-Exec=x-terminal-emulator -e "/usr/local/bin/audiocipher --help"
+[Desktop Action TUI]
+Name=Launch AudioCipher Stego Studio Braille TUI
+Exec=/usr/local/bin/zoth-konsole --title "AudioCipher Stego Studio TUI" -- /usr/local/bin/audiocipher-stego-engine-tui --watch
 
-[Desktop Action Web]
-Name=Open Web UI (Port 8096)
-Exec=/usr/local/bin/audiocipher web
+[Desktop Action WebApp]
+Name=Open Local Web Workstation (:8096)
+Exec=xdg-open http://127.0.0.1:8096

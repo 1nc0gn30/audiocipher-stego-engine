@@ -54,7 +54,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="audiocipher",
         description="Audio-Keyed Cryptography, PCM Steganography & Morse Spectrogram Synthesizer",
     )
-    parser.add_argument("-v", "--version", action="version", version="audiocipher-stego-engine 2.5.0")
+    parser.add_argument("-v", "--version", action="version", version="audiocipher-stego-engine 2.6.0")
     parser.add_argument("--status", action="store_true", help="Print service status")
     parser.add_argument("--json", action="store_true", help="Print JSON status payload")
 
@@ -143,7 +143,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         import json as _json
         payload = {
             "service": "audiocipher-stego-engine",
-            "version": "2.5.0",
+            "version": "2.6.0",
             "status": "healthy",
             "default_port": 8096,
             "local_url": "http://127.0.0.1:8096",
